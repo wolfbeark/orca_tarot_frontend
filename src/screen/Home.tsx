@@ -1,7 +1,7 @@
 /* eslint-disable */
 import React, { useEffect, useRef, useState } from 'react'
 import styled from 'styled-components'
-import {Link, useNavigate} from 'react-router-dom';
+import {Link, useMatch, useNavigate, Outlet} from 'react-router-dom';
 
 import { HorCenterDiv, VerCenterDiv } from 'common_resources/CommonStyle';
 import { IContainer } from 'common_resources/CommonInterfaces';
@@ -29,7 +29,7 @@ const HomeContainer = styled(VerCenterDiv)<IContainer>`
 const HomeContentBox = styled(HorCenterDiv)`
   width: 100%;
   height: 100%;
-  background-color: ${(props) => props.theme.boxColors.standardBlack};
+  background-color: ${(props) => props.theme.canvasBackground};
   position: relative;
   justify-content: space-between;
 `
@@ -52,13 +52,12 @@ const LeftBgBox = styled(VerCenterDiv)<IImgBoxContainer>`
 const InHomeContentBox = styled(VerCenterDiv)`
   width: 100%;
   height: 91%;
-  //opacity: 0.8;
   background-color: transparent;
 `
 const IntroduceModeBox  = styled(VerCenterDiv)`
   width: 70%;
   height: 95%;
-  background-color: ${(props)=> props.theme.boxColors.opaqueBlack};
+  background-color: ${(props)=> props.theme.defaultBaseOpaqueColor};
   border-radius: 5px;
   padding: 1%;
   font-family: ${(props) => props.theme.engFont};
@@ -188,13 +187,15 @@ const InRightPannelBox = styled(VerCenterDiv)`
   width: 100%;
   height: 91%;
   background-color: transparent;
-  justify-content: flex-end;
+  justify-content: space-between;
 `
 const RightAniBox = styled(HorCenterDiv)`
   width: 100%;
   height: 50%;
   background-color: transparent;
   padding: 1%;
+  margin-top : 10%;
+  margin-bottom: 10%;
 `
 const AniBox = styled(HorCenterDiv)<IAniBoxWidth>`
   width: 100%;
@@ -269,6 +270,8 @@ interface IAniBoxWidth {
 function Home() {
 
   const navigate = useNavigate();
+  const homeMatch = useMatch('/');
+  const manualMatch = useMatch('manual')
   const { wheight } = useRecoilValue(totalManagerAtom);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [hoverData, setHoverData] = useState<IHoverControl>({
@@ -395,131 +398,141 @@ function Home() {
         <LeftBgBox
           imgsrc={`${process.env.PUBLIC_URL}/images/LDefaultBackGround.png`}
         >
-          <InHomeContentBox>
-            <IntroduceModeBox>
-              <WelecomeMat>
-                <span>Welcome to this place, translator.</span>
-                <span>
-                  Select the settings to use for the translation. It will help you.
-                </span>
-              </WelecomeMat>
-              <ModeDesSelectBox>
-                <ModeSelectBox>
-                  <ModeSelectName>
-                    Single Mode
-                  </ModeSelectName>
-                  <DivideLine />
-                  <ModeBtnBox>
-                    {
-                      btnNameArr.map((a, i) => {
-                        return(
-                          <ModeBtn
-                              key={`singleModeBtn${i}`}
-                              variants={modeBtnVar}
-                              whileHover={modeBtnVar.hover}
-                              onHoverStart={()=>{
-                                setHoverData({
-                                  isSingle: true,
-                                  isHover: true,
-                                  hoveringType: i,
-                                })
-                              }}
-                              onHoverEnd={()=>{
-                                setHoverData({
-                                  isSingle: null,
-                                  isHover: false,
-                                  hoveringType: -1,
-                                })
-                              }}
-                              onClick={(e)=>{
-                                selectModeHandler(e, true, i);
-                              }}
-                          >
-                            {a}
-                            <AnimatePresence>
-                              <RedCircle 
-                                initial={{opacity: 0}}
-                                animate={
-                                  hoverData.isSingle === true
-                                  && hoverData.isHover 
-                                  && hoverData.hoveringType === i 
-                                  ? {opacity: 1} 
-                                  : {opacity:0}
-                                }
-                                exit={{opacity: 0}}
-                              />
-                            </AnimatePresence>
-                          </ModeBtn>
-                        );
-                      })
-                    }
-                  </ModeBtnBox>
-                </ModeSelectBox>
-                <ModeSelectBox>
-                  <ModeSelectName>
-                    Multi Mode
-                  </ModeSelectName>
-                  <DivideLine />
-                  <ModeBtnBox>
-                    {
-                      btnNameArr.map((a, i) => {
-                        return(
-                          <ModeBtn
-                              key={`multiModeBtn${i}`}
-                              variants={modeBtnVar}
-                              whileHover={modeBtnVar.hover}
-                              onHoverStart={()=>{
-                                setHoverData({
-                                  isSingle: false,
-                                  isHover: true,
-                                  hoveringType: i,
-                                })
-                              }}
-                              onHoverEnd={()=>{
-                                setHoverData({
-                                  isSingle: null,
-                                  isHover: false,
-                                  hoveringType: -1,
-                                })
-                              }}
-                              onClick={(e)=>{
-                                selectModeHandler(e, false, i);
-                              }}
-                          >
-                            {a}
-                            <AnimatePresence>
-                              <RedCircle 
-                                initial={{opacity: 0}}
-                                animate={
-                                  hoverData.isSingle === false
-                                  && hoverData.isHover 
-                                  && hoverData.hoveringType === i 
-                                  ? {opacity: 1} 
-                                  : {opacity:0}
-                                }
-                                exit={{opacity: 0}}
-                              />
-                            </AnimatePresence>
-                          </ModeBtn>
-                        );
-                      })
-                    }
-                  </ModeBtnBox>
-                </ModeSelectBox>
-              </ModeDesSelectBox>
-              <DescriptionBox>
-              <AnimatePresence>
-                {
-                  hoverData.isHover &&
-                  <ModeDescription 
-                    hoverData={hoverData}
-                    modeData={modeData}
-                  />
-                }
-              </AnimatePresence>
-              </DescriptionBox>
-            </IntroduceModeBox>
-          </InHomeContentBox>
+          <AnimatePresence>
+            {homeMatch &&
+            <InHomeContentBox
+              key={`homeContent`}
+              initial={{opacity: 0}}
+              animate={{opacity: 1}}
+              exit={{opacity: 0, zIndex: 2, position: 'absolute'}}
+            >
+              <IntroduceModeBox>
+                <WelecomeMat>
+                  <span>Welcome to this place, translator.</span>
+                  <span>
+                    Select the settings to use for the translation. It will help you.
+                  </span>
+                </WelecomeMat>
+                <ModeDesSelectBox>
+                  <ModeSelectBox>
+                    <ModeSelectName>
+                      Single Mode
+                    </ModeSelectName>
+                    <DivideLine />
+                    <ModeBtnBox>
+                      {
+                        btnNameArr.map((a, i) => {
+                          return(
+                            <ModeBtn
+                                key={`singleModeBtn${i}`}
+                                variants={modeBtnVar}
+                                whileHover={modeBtnVar.hover}
+                                onHoverStart={()=>{
+                                  setHoverData({
+                                    isSingle: true,
+                                    isHover: true,
+                                    hoveringType: i,
+                                  })
+                                }}
+                                onHoverEnd={()=>{
+                                  setHoverData({
+                                    isSingle: null,
+                                    isHover: false,
+                                    hoveringType: -1,
+                                  })
+                                }}
+                                onClick={(e)=>{
+                                  selectModeHandler(e, true, i);
+                                }}
+                            >
+                              {a}
+                              <AnimatePresence>
+                                <RedCircle 
+                                  initial={{opacity: 0}}
+                                  animate={
+                                    hoverData.isSingle === true
+                                    && hoverData.isHover 
+                                    && hoverData.hoveringType === i 
+                                    ? {opacity: 1} 
+                                    : {opacity:0}
+                                  }
+                                  exit={{opacity: 0}}
+                                />
+                              </AnimatePresence>
+                            </ModeBtn>
+                          );
+                        })
+                      }
+                    </ModeBtnBox>
+                  </ModeSelectBox>
+                  <ModeSelectBox>
+                    <ModeSelectName>
+                      Multi Mode
+                    </ModeSelectName>
+                    <DivideLine />
+                    <ModeBtnBox>
+                      {
+                        btnNameArr.map((a, i) => {
+                          return(
+                            <ModeBtn
+                                key={`multiModeBtn${i}`}
+                                variants={modeBtnVar}
+                                whileHover={modeBtnVar.hover}
+                                onHoverStart={()=>{
+                                  setHoverData({
+                                    isSingle: false,
+                                    isHover: true,
+                                    hoveringType: i,
+                                  })
+                                }}
+                                onHoverEnd={()=>{
+                                  setHoverData({
+                                    isSingle: null,
+                                    isHover: false,
+                                    hoveringType: -1,
+                                  })
+                                }}
+                                onClick={(e)=>{
+                                  selectModeHandler(e, false, i);
+                                }}
+                            >
+                              {a}
+                              <AnimatePresence>
+                                <RedCircle 
+                                  initial={{opacity: 0}}
+                                  animate={
+                                    hoverData.isSingle === false
+                                    && hoverData.isHover 
+                                    && hoverData.hoveringType === i 
+                                    ? {opacity: 1} 
+                                    : {opacity:0}
+                                  }
+                                  exit={{opacity: 0}}
+                                />
+                              </AnimatePresence>
+                            </ModeBtn>
+                          );
+                        })
+                      }
+                    </ModeBtnBox>
+                  </ModeSelectBox>
+                </ModeDesSelectBox>
+                <DescriptionBox>
+                <AnimatePresence>
+                  {
+                    hoverData.isHover &&
+                    <ModeDescription 
+                      hoverData={hoverData}
+                      modeData={modeData}
+                    />
+                  }
+                </AnimatePresence>
+                </DescriptionBox>
+              </IntroduceModeBox>
+            </InHomeContentBox>
+            }
+            <Outlet key={`homeOutlet`}/>
+          </AnimatePresence>
         </LeftBgBox>
         <RightPannelBox>
           <InRightPannelBox>
@@ -561,41 +574,53 @@ function Home() {
                 {/* <AniBoxMask /> */}
               </AniBox>
             </RightAniBox>
-            <RightControlBox>
-              <ShowModeDataBox>
-                <CurrentModeName>
-                  Selected Mode 
-                </CurrentModeName>
-                <DesTyping modeData={modeData}/>
-              </ShowModeDataBox>
-              <NextBtnBox>
+              <RightControlBox>
                 <AnimatePresence>
                   {
-                    modeData.isSelected
-                    &&
-                    <NextBtn
-                     initial={{
-                      opacity: 0
-                     }}
-                     animate={{
-                      opacity: 1,
-                      color: ['rgba(240, 147, 43,1.0)', 'rgba(240, 147, 43, 0.2)','rgba(240, 147, 43,1.0)'],
-                      transition: {
-                          color:{
-                              repeat: Infinity,
-                              duration: 1.5
-                          }
-                      }
-                     }}
+                    homeMatch &&
+                    <motion.div 
+                      style={{
+                        width: "100%",
+                        height: "100%"
+                      }}
                     >
-                      <Link to='/spread/make' state={{autoStart : true}}>
-                        Start Translation
-                      </Link>
-                    </NextBtn>
+                      <ShowModeDataBox>
+                        <CurrentModeName>
+                          Selected Mode 
+                        </CurrentModeName>
+                        <DesTyping modeData={modeData}/>
+                      </ShowModeDataBox>
+                      <NextBtnBox>
+                        <AnimatePresence>
+                          {
+                            modeData.isSelected
+                            &&
+                            <NextBtn
+                              initial={{
+                              opacity: 0
+                              }}
+                              animate={{
+                              opacity: 1,
+                              color: ['rgba(240, 147, 43,1.0)', 'rgba(240, 147, 43, 0.2)','rgba(240, 147, 43,1.0)'],
+                              transition: {
+                                  color:{
+                                      repeat: Infinity,
+                                      duration: 1.5
+                                  }
+                              }
+                              }}
+                            >
+                              <Link to='/spread/make' state={{autoStart : true}}>
+                                Start Translation
+                              </Link>
+                            </NextBtn>
+                          }
+                        </AnimatePresence>
+                      </NextBtnBox>
+                    </motion.div>
                   }
                 </AnimatePresence>
-              </NextBtnBox>
-            </RightControlBox>
+              </RightControlBox>                  
           </InRightPannelBox>
         </RightPannelBox>
       </HomeContentBox>

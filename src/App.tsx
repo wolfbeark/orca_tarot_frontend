@@ -1,11 +1,11 @@
 /* eslint-disable */
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import logo from './logo.svg';
 import './App.css';
-import styled, { ThemeProvider } from 'styled-components';
+import styled, { DefaultTheme, ThemeProvider } from 'styled-components';
 import { Outlet, useLocation } from 'react-router-dom';
 import { ERROR_ACCESS } from 'common_resources/ErrorMessage';
-import { LightTheme } from 'common_resources/Theme';
+import { LightTheme, DarkTheme } from 'common_resources/Theme';
 import { useRecoilState } from 'recoil';
 import { totalManagerAtom } from 'recoil/TotalAtom';
 import TopNavBar from 'components/common_res/TopNavBar';
@@ -20,6 +20,7 @@ const AppContainer = styled.div`
 function App() {
   const {access_fail} = ERROR_ACCESS;
   const [totalManager, setTotalManager] = useRecoilState(totalManagerAtom);
+  const [themeValue, setThemeValue] = useState<boolean>(false);
   const location = useLocation();
   useEffect(()=>{
     let _totalManager = JSON.parse(JSON.stringify(totalManager));
@@ -27,12 +28,12 @@ function App() {
     setTotalManager(_totalManager);
   }, [])
   return (
-    <ThemeProvider theme={LightTheme}>
+    <ThemeProvider theme={!themeValue ? LightTheme : DarkTheme}>
       <AppContainer>
         {
           location.pathname !== '/login'
           &&
-          <TopNavBar />
+          <TopNavBar setThemeValue={setThemeValue} themeValue={themeValue}/>
         }
         {/* {
           location.pathname !== '/login'

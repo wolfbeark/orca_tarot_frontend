@@ -5,6 +5,7 @@ import { createBrowserRouter } from "react-router-dom";
 import Error404 from "screen/Error404";
 import Home from "screen/Home";
 import Login from "screen/Login";
+import Manual from "screen/Manual";
 
 import Spread from "screen/Spread";
 import SingleSpread from 'screen/spread_child/SingleSpread'
@@ -18,7 +19,13 @@ const router = createBrowserRouter([
         children: [
             {
                 path: '',
-                element: <Home />
+                element: <Home />,
+                children:[
+                    {
+                        path: 'manual',
+                        element: <Manual />
+                    }
+                ]
             },
             {
                 path: 'login',

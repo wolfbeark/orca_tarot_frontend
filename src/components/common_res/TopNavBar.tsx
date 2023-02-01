@@ -1,11 +1,16 @@
 /* eslint-disable */
-import React, {useState} from 'react'
+import React, {SetStateAction, useState} from 'react'
 import styled from 'styled-components';
 import {HorCenterDiv, VerCenterDiv} from 'common_resources/CommonStyle';
 import { PathMatch, useMatch, Link } from 'react-router-dom';
 import { RxGear } from 'react-icons/rx'
 import HTimer from 'components/home_res/HTimer'
 import { AnimatePresence } from 'framer-motion';
+
+interface ITopNavBar {
+    setThemeValue : React.Dispatch<SetStateAction<boolean>>
+    themeValue : boolean
+}
 
 const TopNavBarContainer = styled(HorCenterDiv)`
     width: 100%;
@@ -14,12 +19,10 @@ const TopNavBarContainer = styled(HorCenterDiv)`
     top: 0;
     z-index: 3;
     user-select: none;
-    //padding: 0 1% 0 1%;
     justify-content: space-between;
-    background-color: rgba(0, 0, 0, 0.2);
-    box-shadow: 0 -2px 5px 2px rgba(247, 241, 227, 0.5);
-    //background-image: linear-gradient(black, transparent);
-    //opacity: 0.2;
+    background-color: ${(props) => props.theme.topNavBarBackground};
+    box-shadow: ${(props) => props.theme.topNavBarShadow};
+    
 `
 const LeftContentBox = styled(HorCenterDiv)`
     width: 50%;
@@ -106,6 +109,16 @@ const OptionPannel = styled(VerCenterDiv)`
     bottom: -510%;
     border-radius: ${(props) => props.theme.borders.small};
     background-color: rgba(209, 204, 192, 0.15);
+    justify-content: flex-start;
+    padding: 0.5%;
+`
+const ThemeChangeBtn = styled(HorCenterDiv)`
+    width: 100%;
+    min-height: 8%;
+    background-color: yellow;
+    user-select: none;
+    cursor: pointer;
+    border-radius: ${(props) => props.theme.borders.small};
 `
 
 const MenuBtnVar = {
@@ -115,7 +128,7 @@ const MenuBtnVar = {
     }
 }
 //linear-gradient(to right, rgba(251, 252, 185, 0.745), rgba(255, 205, 243, 0.667), rgba(101, 211, 255, 0.667))
-function TopNavBar() {
+function TopNavBar(props : ITopNavBar) {
 
     const homeMatch = useMatch('/');
     const singleMatch = useMatch('/spread/*');
@@ -136,6 +149,11 @@ function TopNavBar() {
     const changeOpenOpt = (e: React.MouseEvent<HTMLDivElement>) => {
         e.preventDefault();
         setIsClickedOpt((prev) => !prev)
+    }
+
+    const changeThemeHandler = (e : React.MouseEvent<HTMLDivElement>) => {
+        e.preventDefault();
+        props.setThemeValue((prev) => !prev);
     }
   return (
     <TopNavBarContainer>
@@ -246,7 +264,11 @@ function TopNavBar() {
                         }
                     }}
                 >
-
+                    <ThemeChangeBtn
+                        onClick={changeThemeHandler}
+                    >
+                        {props.themeValue === false ? 'White' : 'Dark'}
+                    </ThemeChangeBtn>
                 </OptionPannel>
                 }
             </AnimatePresence>
@@ -255,4 +277,4 @@ function TopNavBar() {
   )
 }
 
-export default TopNavBar
+export default React.memo(TopNavBar)

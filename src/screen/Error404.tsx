@@ -183,13 +183,13 @@ function Error404() {
 
   const navigate = useNavigate();
 
+  
   useEffect(()=> {
-    // setTimeout(()=>{
-    //   setIsArrive(true)
-    // }, 3500)
-    setTimeout(()=>{
-      navigate('/')
-    }, 5000);
+    let time = setTimeout(()=>{navigate('/')}, 5000);
+    
+    return() => {
+      clearTimeout(time);
+    } 
   }, [])
   return (
     <Error404Container>

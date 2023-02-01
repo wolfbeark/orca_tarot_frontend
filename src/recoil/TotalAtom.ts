@@ -1,22 +1,24 @@
 import {atom} from 'recoil';
 
-interface ITotalManagerAtom {
+export interface ITotalManagerAtom {
     wheight : number,
-    projectCount : number | null,
-    singleNormalCount : number | null,
-    singleSandboxCount : number | null,
-    multiNormalCount : number | null,
-    multiSandboxCount : number | null,
+    projectCount : number,
+    currentTabNumber : number,
+    singleNormalCount : number,
+    singleSandboxCount : number,
+    multiNormalCount : number,
+    multiSandboxCount : number,
 }
 
 export const totalManagerAtom = atom<ITotalManagerAtom>({
-    key: "totalManagerAtom",
+    key: "totalManagerAtomManager",
     default:{
         wheight: 0,
-        projectCount: null,
-        singleNormalCount : null,
-        singleSandboxCount : null,
-        multiNormalCount : null,
-        multiSandboxCount : null,
+        projectCount: 0,
+        currentTabNumber : 0,
+        singleNormalCount : 0,
+        singleSandboxCount : 0,
+        multiNormalCount : 0,
+        multiSandboxCount : 0,
     }
 })

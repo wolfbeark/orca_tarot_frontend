@@ -1,15 +1,18 @@
 /* eslint-disable */
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import styled from 'styled-components'
 import { HorCenterDiv, VerCenterDiv } from 'common_resources/CommonStyle'
 import { IContainer } from 'common_resources/CommonInterfaces'
-import { useRecoilValue } from 'recoil'
+import { useRecoilState, useRecoilValue } from 'recoil'
 import { totalManagerAtom } from 'recoil/TotalAtom'
 
 import { IImgBoxContainer } from 'common_resources/ComponentInterface'
-import { Outlet, Link, useMatch } from 'react-router-dom'
+import { Outlet, Link, useMatch, useLocation } from 'react-router-dom'
 import { AnimatePresence } from 'framer-motion'
 import SpreadTotal from 'components/spread_res/SpreadTotal'
+import { ISingleControlManagerAtom, singleControlManagerAtom } from 'recoil/SingleAtom'
+
+import {FaAngleDoubleRight} from 'react-icons/fa';
 
 const SpreadContainer = styled(VerCenterDiv)<IContainer>`
   width: 100%;
@@ -24,7 +27,6 @@ const ContentBox = styled(HorCenterDiv)`
   width: 100%;
   height: 100%;
   background-color: rgba(20, 20, 20, 1);
-  //background-color: skyblue;
   position: relative;
   justify-content: space-between;
   position: relative;
@@ -53,7 +55,6 @@ const RightPannelBox = styled(VerCenterDiv)`
   justify-content: flex-end;
   padding: 1%;
   z-index: 1;
-  //padding-top: 10%;
 `
 const InContentBox = styled(VerCenterDiv)`
     width: 100%;
@@ -64,10 +65,7 @@ const InContentBox = styled(VerCenterDiv)`
     bottom: 0;
     justify-content: space-between;
     background-color: transparent;
-    //padding: 0 0.5% 0.5% 0.5%;
-
-    //border: 2px solid gray;
-    //padding: 0.5%;
+   
 `
 const TrickBox = styled(HorCenterDiv)`
     width: 100%;
@@ -84,8 +82,8 @@ const ModeTab = styled(VerCenterDiv)`
     position: absolute;
     z-index: 2;
     left: 0%;
-    //background-color: rgba(24, 220, 255, 1);
     background-color: rgba(20, 20, 20, 0.2);
+    //background-color: rgba(24, 220, 255, 1);
 `
 const SecondTab = styled(VerCenterDiv)`
     width: 12%;
@@ -96,7 +94,77 @@ const SecondTab = styled(VerCenterDiv)`
     left: 12%;
     //background-color: rgba(24, 220, 255, 1);
     background-color: rgba(20, 20, 20, 0.2);
+    justify-content: flex-start;
+    //padding: 0.5%;
+
+    justify-content: flex-start;
+    align-items: flex-end;
+    user-select: none;
+    
+    scroll-behavior: auto;
+    overflow: overlay;
+    overflow-x: hidden;
+
+    /* grid-template-columns: repeat(auto-fit, minmax(13%, 1fr));
+    grid-template-rows: repeat(auto-fit, minMax(40%, 1fr));
+    grid-auto-columns: 13%;
+    grid-auto-rows: 40%;
+    grid-gap: 3%; */
+    display: grid;
+
+    ::-webkit-scrollbar {
+        width: 1vw;
+    }
+    ::-webkit-scrollbar-thumb {
+        background-color: hsla(0, 0%, 42%, 0.49);
+        border-radius: 100px;
+    }
 `
+const SecondTabWrapper = styled(HorCenterDiv)`
+    width: 12%;
+    height: 100%;
+    position: absolute;
+    z-index: 2;
+    left: 12%;
+    background-color: rgba(20, 20, 20, 0.2);
+    justify-content: flex-start;    
+`
+const SecondTabFoldBtn = styled(HorCenterDiv)<IFoldBtn>`
+    width: ${(props) => `${props.foldwidth}px`};
+    height: 100%;
+    background-color: ${(props) => props.theme.boxColors.opaqueBlack};
+    color: white;
+    cursor: pointer;
+    z-index: 3;
+    //background-color: red;
+`
+const SecondTabContentBox = styled(VerCenterDiv)`
+    width: 100%;
+    height: 100%;
+    //background-color: blue;
+    position: absolute;
+    padding-left: 1%;
+    
+    display: flex;
+    justify-content: flex-start;
+    align-items: flex-end;
+    overflow: auto;
+
+`
+const SecondTabItem = styled(HorCenterDiv)`
+    min-width: 85%;
+    min-height: 8%;
+    background-color: transparent;
+    border-radius: ${(props) => props.theme.borders.small};
+    color: white;
+    position: relative;
+    cursor: pointer;
+    margin-bottom: 5%;
+`
+
+
+
+
 const SingleTab = styled(VerCenterDiv)`
     width: 12%;
     //padding-left: 2%;
@@ -112,8 +180,6 @@ const SingleTab = styled(VerCenterDiv)`
 const TabBox = styled(VerCenterDiv)`
     width: 100%;
     height: 100%;
-    //background-color: rgba(250, 130, 49,1.0);
-    //background-color: rgba(24, 220, 255, 1);
     background-color: transparent;
     justify-content: flex-start;
     align-items: flex-end;
@@ -123,7 +189,9 @@ const TabItem = styled(HorCenterDiv)`
     width: 85%;
     height: 8%;
     //background-color: saddlebrown;
+    user-select : none;
     margin-bottom: 5%;
+    border-radius: ${(props) => props.theme.borders.small};
     
     a{
         width: 100%;
@@ -135,24 +203,24 @@ const TabItem = styled(HorCenterDiv)`
     }
 `
 const TabFoldBtn = styled(HorCenterDiv)`
-    width: 1%;
-    height: 8%;
-    background-color: red;
+    width: 1.5%;
+    height: 100%;
+    background-color: ${(props) => props.theme.boxColors.opaqueBlack};
+    color: white;
     position: absolute;
     left: 0;
     top: 0;
     //transform: translateY(-50%); 
     cursor: pointer;
     z-index: 3;
+    //background-color: red;
+
 `
 const SpreadZone = styled(HorCenterDiv)`
     width: 100%;
     height: 100%;
     background-color: transparent;
-    /* padding-top: 0.5%;
-    padding-bottom: 0.5%; */
-    /* border: 2px solid gray;
-    border-top: none; */
+    position: relative;
 `
 const RedCircle = styled(HorCenterDiv)`
     width: 5px;
@@ -162,6 +230,8 @@ const RedCircle = styled(HorCenterDiv)`
     position: absolute;
     right: 5%;
 `
+
+
 
 const tabVar = {
     initial:{
@@ -193,12 +263,18 @@ const tabVar = {
                 duration: 1
             }
         }
+    },
+    exit:{
+        opacity: 0,
+        transition: {
+            duration: 0.3
+        }
     }
 }
 
 const modeTabVar = {
     initial: {
-        opacity: 1
+        opacity: 0
     },
     fold:{
         opacity: 0,
@@ -207,10 +283,18 @@ const modeTabVar = {
         opacity : 1,
     }
 }
+interface IFoldBtn{
+    foldwidth: number
+}
+
 
 function Spread() {
     const { wheight } = useRecoilValue(totalManagerAtom);
+    const [singleManager, setSingleManager] = useRecoilState(singleControlManagerAtom);
+    const location = useLocation();
+    const foldRef = useRef() as React.MutableRefObject<HTMLDivElement>;
     const [tabNumber, setTabNumber] = useState<number>(0);
+    const [foldWidth, setFoldWidth] = useState<number>(0);
     const spreadMatch = useMatch('/spread');
     const singleMatch = useMatch('/spread/single');
     const multiMatch = useMatch('/spread/multi');
@@ -223,10 +307,11 @@ function Spread() {
     const linkArr : string[] = ["/spread", "single", "multi", "create"]
 
     const [isFoldTab, setIsFoldTab] = useState<boolean>(false);
-    const [isSecondFoldTab, setIsSecondFoldTab] = useState<boolean>(true);
+    const [isOpenSecondFoldTab, setIsOpenSecondFoldTab] = useState<boolean>(false);
     const [isThirdFoldTab, setIsThirdFoldTab] = useState<boolean>(true);
 
     useEffect(()=>{
+
         if(spreadMatch){
             setTabNumber(0);
         }
@@ -239,8 +324,40 @@ function Spread() {
         else if(createdMatch){
             setTabNumber(3);
         }
-    }, [])
+    }, [location])
+    useEffect(()=>{
+        let _tempRef = foldRef?.current.getBoundingClientRect();
+        setFoldWidth(_tempRef.width);
+    })
 
+    const secondTabVar = {
+        initial:{
+            width: `${foldWidth}px`,
+        },
+        inactive : {
+            width: `${foldWidth}px`,
+            backgroundColor: `rgba(20, 20, 20, 0)`,
+            transition: {
+                delay: 0.3
+            }
+        },
+        active: {
+            width: `12%`,
+            backgroundColor: `rgba(20, 20, 20, 0.2)`,
+        }
+    }
+
+    const allTabFoldHandler = (e : React.MouseEvent<HTMLDivElement>) => {
+        e.preventDefault();
+        setIsFoldTab(!isFoldTab)
+    }
+    const onChangeSingleCurrentNumber = (e : React.MouseEvent<HTMLDivElement>, num : number) => {
+        e.preventDefault();
+        if(num === singleManager.cur_ProjectNumber) return;
+        let _tempManager : ISingleControlManagerAtom = JSON.parse(JSON.stringify(singleManager));
+        _tempManager.cur_ProjectNumber = num;
+        setSingleManager(_tempManager);
+    }
   return (
     <SpreadContainer
         wheight={wheight}
@@ -259,6 +376,11 @@ function Spread() {
                             isFoldTab === true
                             ? modeTabVar.fold
                             : {}
+                        }
+                        style={
+                            isFoldTab === true
+                            ? {zIndex: 0}
+                            : {zIndex: 3}
                         }
                     >
                     <AnimatePresence>
@@ -287,26 +409,9 @@ function Spread() {
                                                 : tabVar.hover
                                             }
                                             onClick={(e) => {
-                                                //e.preventDefault();
+                                                e.preventDefault();
                                                 setTabNumber(i);
-                                                if(i === 1){
-                                                    // if(isThirdFoldTab){
-                                                    //     setIsThirdFoldTab(false)
-                                                    // }
-                                                    if(singleMatch){
-                                                        setIsSecondFoldTab(!isSecondFoldTab)
-                                                    }
-                                                }
-                                                else if(i === 2){
-                                                    // if(isSecondFoldTab){
-                                                    //     setIsSecondFoldTab(false)
-                                                    // }
-                                                    if(multiMatch){
-                                                        setIsThirdFoldTab(!isThirdFoldTab)
-                                                    }
-                                                }
                                             }}
-                                            
                                         >
                                             <Link to={linkArr[i]}>
                                                 {a}
@@ -329,19 +434,86 @@ function Spread() {
                         }
                     </AnimatePresence>
                     </ModeTab>
-                    {
-                        (isSecondFoldTab && singleMatch) &&
-                        <SecondTab
-                            variants={modeTabVar}
-                            animate={
-                                isFoldTab === true
-                                ? modeTabVar.fold
-                                : {}
-                            }
-                        >
-                            second
-                        </SecondTab>
-                    }
+                    <AnimatePresence>
+                        {
+                            (
+                                singleManager.isExistProject &&
+                                singleMatch &&
+                                isFoldTab === false
+                            ) &&
+                            <SecondTabWrapper
+                                variants={secondTabVar}
+                                initial={false}
+                                animate={
+                                    isOpenSecondFoldTab
+                                    ? secondTabVar.active
+                                    : secondTabVar.inactive
+                                }
+                            >
+                                <AnimatePresence>
+                                <SecondTabFoldBtn
+                                    foldwidth={foldWidth}
+                                    initial={{opacity: 0}}
+                                    animate={{opacity: 1}}
+                                    exit={{opacity: 0}}
+                                    onClick={()=> setIsOpenSecondFoldTab((prev) => !prev)}
+                                >
+                                    <FaAngleDoubleRight />
+                                </SecondTabFoldBtn>
+                                </AnimatePresence>
+                                <AnimatePresence>
+                                {
+                                    isOpenSecondFoldTab &&
+                                    <SecondTabContentBox
+                                        initial={{opacity: 0}}
+                                        animate={{opacity: 1}}
+                                        exit={{opacity: 0}}
+                                    >
+                                        {singleManager.singleProjectArr.map((a, i) => {
+                                        return(
+                                            <AnimatePresence
+                                                key={`singleTab${i}`}
+                                            >
+                                            <SecondTabItem
+                                                variants={tabVar}
+                                                initial={tabVar.initial}
+                                                animate={ 
+                                                    i === singleManager.cur_ProjectNumber
+                                                    ? tabVar.active
+                                                    : tabVar.inactive
+                                                }
+                                                whileHover={
+                                                    i === singleManager.cur_ProjectNumber
+                                                    ? {}
+                                                    : tabVar.hover
+                                                }
+                                                onClick={(e)=>{
+                                                    onChangeSingleCurrentNumber(e, i)
+                                                }}
+                                                exit={tabVar.exit}
+                                            >
+                                                {a.projectName}
+                                                {
+                                                    i === singleManager.cur_ProjectNumber &&
+                                                    <AnimatePresence>
+                                                        <RedCircle 
+                                                            initial={{opacity:0}}
+                                                            animate={{opacity:1}}
+                                                            exit={{opacity:0}}
+                                                        />
+                                                    </AnimatePresence>
+                                                }
+                                            </SecondTabItem>
+                                            </AnimatePresence>
+                                        );
+                                    })}
+                                    </SecondTabContentBox>
+                                }
+                                </AnimatePresence>
+                            </SecondTabWrapper>
+                        }
+    
+                    </AnimatePresence>
                     {
                         (isThirdFoldTab && multiMatch) &&
                         <SecondTab
@@ -356,19 +528,19 @@ function Spread() {
                         </SecondTab>
                     }
                     <SpreadZone>
-                        <TabFoldBtn 
-                            onClick={(e)=>{
-                                e.preventDefault();
-                                setIsFoldTab(!isFoldTab)
-                            }}
+                        <TabFoldBtn
+                            ref={foldRef} 
+                            onClick={allTabFoldHandler}
                         >
-                            
+                            <FaAngleDoubleRight />
                         </TabFoldBtn>
                         {
                             spreadMatch &&
                             <SpreadTotal setTabNumber={setTabNumber}/>
                         }
-                        <Outlet />
+                        <Outlet context={{
+                            setTabNumber
+                        }}/>
                     </SpreadZone>
                 </TrickBox>
             </InContentBox>

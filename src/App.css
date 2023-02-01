@@ -4,3 +4,10 @@
     url("/public/fonts/Anton-Regular.woff") format("woff");
   font-display: block;
 }
+
+@font-face {
+  font-family: "Jua";
+  src: url("/public/fonts/Jua-Regular.woff2") format("woff2"),
+    url("/public/fonts/Jua-Regular.woff") format("woff");
+  font-display: block;
+}

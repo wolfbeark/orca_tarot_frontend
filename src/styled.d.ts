@@ -6,9 +6,19 @@ declare module 'styled-components'{
     export interface DefaultTheme{
         // Common Styles
         engFont : string;
+        korFont : string;
         borders : BorderType;
         boxColors : BoxColors;
         textColors : TextColors;
+        canvasBackground : string;
+        topNavBarShadow : string;
+        topNavBarBackground : string;
+        defaultBaseColor : string;
+        defaultBaseOpaqueColor : string;
+
+        // Spread
+        spreadCarpet : string;
+
         //Login
     }
 }

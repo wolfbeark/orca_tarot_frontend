@@ -2,21 +2,22 @@
 import {atom} from 'recoil';
 
 export enum EOracleType {
-    tarot = "TAROT",
-    lenormand = "LENORMAND",
-    iching = 'ICHING',
-    poker = 'POKER'
+    "TAROT",
+    "LENORMAND",
+    'ICHING',
+    'POKER'
 }
 export interface ICreateControlManager {
     isCreating: boolean,
     isLoading: boolean,
     creatingStep : number,
+    projectName : string,
     projectType : boolean | null, // false : single, true : multi
     isSandbox : boolean | null, // false : normal, true : sandbox
-    oracleType : EOracleType | null,
+    oracleType : number | null,
     cardCount: number | null,
     NS_T_PreviewCard : boolean | null, // if normal, tarot, preview three cards
-    NS_T_UseAutoDeck : number | null
+    NS_T_UseAutoDeck : number,
 }
 export const createControlManager = atom<ICreateControlManager>({
     key: "createControlManager",
@@ -24,12 +25,13 @@ export const createControlManager = atom<ICreateControlManager>({
         isCreating : true,
         isLoading : false,
         creatingStep: 0,
-        projectType: null,
-        isSandbox : null,
-        oracleType : null,
-        cardCount : null,
-        NS_T_PreviewCard : null,
-        NS_T_UseAutoDeck : null,
+        projectType: null, // f
+        isSandbox : null, // f
+        projectName: ``, // s
+        oracleType : null, // s
+        cardCount : null, // s
+        NS_T_PreviewCard : null, // s
+        NS_T_UseAutoDeck : 0, // s
     }
 })
 

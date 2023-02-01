@@ -1,10 +1,10 @@
 /* eslint-disable */
-import React,{Dispatch, SetStateAction} from 'react';
+import React,{Dispatch, SetStateAction, useEffect, useState} from 'react';
 import styled from 'styled-components';
-import {motion} from 'framer-motion';
+import {AnimatePresence, motion} from 'framer-motion';
 import {HorCenterDiv, VerCenterDiv} from 'common_resources/CommonStyle';
 import { useRecoilState } from 'recoil';
-import { totalManagerAtom } from 'recoil/TotalAtom';
+import { ITotalManagerAtom, totalManagerAtom } from 'recoil/TotalAtom';
 import { Link, useNavigate } from 'react-router-dom';
 import { Typing } from 'components/common_res/typing_res/Typing';
 
@@ -17,6 +17,7 @@ const SpreadTotalContainer = styled(HorCenterDiv)`
     height: 100%;
     //background-color: skyblue;
     font-family: ${(props) => props.theme.engFont};
+    position: relative;
 `
 const ProjectAllEmptyBox = styled(VerCenterDiv)`
     width: 40%;
@@ -79,17 +80,103 @@ const TypingBox = styled(VerCenterDiv)`
     }
 `
 
+const TotalNoticeBoard = styled(VerCenterDiv)`
+    width: 80%;
+    height: 95%;
+    background-color: ${(props) => props.theme.boxColors.opaqueBlack};
+    position: absolute;
+    right: 5%;
+    border-radius: ${(props) => props.theme.borders.small};
+    padding: 0.5%;
+`
+const InTotalNoticeBoard = styled(VerCenterDiv)`
+    width: 100%;
+    height: 100%;
+    background-color: inherit;
+    border-radius: inherit;
+    justify-content: space-between;
+    //padding: 1%;
+`
+const NoticeTypingBox = styled(HorCenterDiv)`
+    width: 100%;
+    height: 12%;
+    //background-color: gray;
+    padding-left: 2%;
+    justify-content: flex-start;
+    user-select: none;
+     & span:first-child {
+        font-size: 180%;
+        width: 100%;
+        height: 40%;
+        color: ${(props) => props.theme.textColors.swanWhite};
+    }
+`
+const NoticeContentBox = styled(VerCenterDiv)`
+    width: 100%;
+    height: 87%;
+    padding-left: 2%;
+    justify-content: space-between;
+    
+`
+const SpreadModeTabsContainer = styled(HorCenterDiv)`
+    width: 100%;
+    height: 10%;
+    padding: 0.5% 0.5% 0% 0;
+    justify-content: flex-start;
+`
+const SpreadNoticeContentBox = styled(HorCenterDiv)`
+    width: 100%;
+    height: 89%;
+    background-color: olive;
+    border: 2px solid rgba(24, 220, 255, 0.7);
+    border-radius: ${(props) => props.theme.borders.small};
+`
+const ModeTabItem = styled(HorCenterDiv)`
+    width: 15%;
+    height: 100%;
+    background-color: ${(props) => props.theme.boxColors.opaqueBlack};
+    margin-right: 1%;
+    border-radius: ${(props) => props.theme.borders.small};
+    cursor: pointer;
+    user-select: none;
+`
+const tabItemVar = {
+    // initial:{
+    //     backgroundColor: 'rgba(23, 65, 234, 1)'
+    // },
+    active: {
+        backgroundColor: 'rgba(23, 65, 234, 1)'
+    },
+    inactive: {
+        backgroundColor: 'rgba(23, 65, 24, 0.2)'
+    }
+}
+
 
 function SpreadTotal({setTabNumber} : ISpreadTotal) {
 
     const navigate = useNavigate();
     const [totalManager, setTotalManager] = useRecoilState(totalManagerAtom);
+    //const [currentTabNum, setCurrentTabNum] = useState<number>(totalManager.currentTabNumber);
     
-
+    const tabNameArr = ["TOTAL", "SINGLE", "MULTI"]
     const linkToCreateHandler = (e : React.MouseEvent<HTMLDivElement>) => {
         e.preventDefault();
         setTabNumber(3);
         navigate('create')
+    }
+
+    // useEffect(()=>{
+    //    setCurrentTabNum(totalManager.currentTabNumber);
+    // }, [])
+
+    const chnageTabNumberHandler = (e : React.MouseEvent<HTMLDivElement>, num : number) => {
+        e.preventDefault();
+        if(num === totalManager.currentTabNumber) return;
+        //setCurrentTabNum(num);
+        let _temp : ITotalManagerAtom = JSON.parse(JSON.stringify(totalManager));
+        _temp.currentTabNumber = num;
+        setTotalManager(_temp);
     }
   return (
     <SpreadTotalContainer>
@@ -133,8 +220,51 @@ function SpreadTotal({setTabNumber} : ISpreadTotal) {
             </div>
         </ProjectAllEmptyBox>
         }
+        {totalManager.projectCount > 0 &&
+            <TotalNoticeBoard>
+                <InTotalNoticeBoard>
+                    <NoticeTypingBox>
+                        <Typing
+                            text={"Controllers for all spreads"}
+                            letterSpacing={0.1}
+                            cursorThickness={0}
+                            typeSpeed={3}
+                        />
+                    </NoticeTypingBox>
+                    <NoticeContentBox>
+                        <SpreadModeTabsContainer>
+                        {
+                            tabNameArr.map((a, i) => {
+                            return(
+                                <ModeTabItem
+                                    key={`totalContentTab${a}${i}`}
+                                    variants={tabItemVar}
+                                    //initial={tabItemVar.initial}
+                                    animate={
+                                        i === totalManager.currentTabNumber
+                                        ? tabItemVar.active
+                                        : tabItemVar.inactive
+                                    }
+                                    onClick={(e) => chnageTabNumberHandler(e, i)}
+                                >{a}</ModeTabItem>
+                            );
+                            })
+                        }
+                        </SpreadModeTabsContainer>
+                        <SpreadNoticeContentBox>
+                            <AnimatePresence>
+                            {
+                                totalManager.currentTabNumber === 1 &&
+                                <div>{totalManager.currentTabNumber}</div>
+                            }
+                            </AnimatePresence>
+                        </SpreadNoticeContentBox>
+                    </NoticeContentBox>
+                </InTotalNoticeBoard>
+            </TotalNoticeBoard>
+        }
     </SpreadTotalContainer>
   )
 }
 
-export default SpreadTotal
+export default React.memo(SpreadTotal);
