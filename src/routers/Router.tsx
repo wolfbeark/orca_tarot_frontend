@@ -53,7 +53,7 @@ const router = createBrowserRouter([
         errorElement: <Error404 />
     }
 ],{
-    basename: `${process.env.PUBLIC_URL}`
+    basename: process.env.PUBLIC_URL
 });
 
 export default router;
