@@ -1,0 +1,19 @@
+{
+  "files": {
+    "main.css": "/orca_tarot_frontend/static/css/main.a7499dfd.css",
+    "main.js": "/orca_tarot_frontend/static/js/main.688908f3.js",
+    "static/js/787.8b6a83c1.chunk.js": "/orca_tarot_frontend/static/js/787.8b6a83c1.chunk.js",
+    "static/media/Jua-Regular.woff": "/orca_tarot_frontend/static/media/Jua-Regular.55ccf75a335c89778028.woff",
+    "static/media/Jua-Regular.woff2": "/orca_tarot_frontend/static/media/Jua-Regular.f5d4feb5790b03da599a.woff2",
+    "static/media/Anton-Regular.woff": "/orca_tarot_frontend/static/media/Anton-Regular.4337c4346e2a6971e3aa.woff",
+    "static/media/Anton-Regular.woff2": "/orca_tarot_frontend/static/media/Anton-Regular.b3a57982e82d9e3082b6.woff2",
+    "index.html": "/orca_tarot_frontend/index.html",
+    "main.a7499dfd.css.map": "/orca_tarot_frontend/static/css/main.a7499dfd.css.map",
+    "main.688908f3.js.map": "/orca_tarot_frontend/static/js/main.688908f3.js.map",
+    "787.8b6a83c1.chunk.js.map": "/orca_tarot_frontend/static/js/787.8b6a83c1.chunk.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.a7499dfd.css",
+    "static/js/main.688908f3.js"
+  ]
+}
