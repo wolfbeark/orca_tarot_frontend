@@ -28,8 +28,11 @@ export const LightTheme : DefaultTheme = {
     topNavBarBackground: 'rgba(0, 0, 0, 0.2)',
     defaultBaseColor: 'rgba(223, 228, 234,1.0)',
     defaultBaseOpaqueColor: 'rgba(223, 228, 234, 0.2)',
+    
     spreadCarpet: 'rgba(18, 137, 167, 0.2)',
-    spreadDefaultTextColor: "rgba(30, 39, 46,1.0)"
+    spreadDefaultTextColor: "rgba(30, 39, 46,1.0)",
+    spreadBtnDefaultborder: '2px solid rgba(24, 220, 255, 0.3)',
+
 }
 export const DarkTheme : DefaultTheme = {
     engFont: "Anton",
@@ -45,7 +48,9 @@ export const DarkTheme : DefaultTheme = {
 
     //Spread
     spreadCarpet: 'rgba(111, 30, 81, 0.3)',
-    spreadDefaultTextColor: "rgba(247, 241, 227,1.0)"
+    spreadDefaultTextColor: "rgba(247, 241, 227,1.0)",
+    spreadBtnDefaultborder: '2px solid rgba(24, 220, 255, 0.3)',
+
 }
 
 // export const BlackRedTheme : DefaultTheme = {

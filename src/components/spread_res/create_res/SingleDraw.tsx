@@ -144,6 +144,7 @@ const CountDesTextBox = styled(HorCenterDiv)`
     padding: 1%;
     font-family: ${(props) => props.theme.korFont};
     color: white;
+    border : ${(props) => props.theme.spreadBtnDefaultborder};
 `
 const CountText = styled(HorCenterDiv)`
     width: 70%;
@@ -223,20 +224,18 @@ const ModifyPannel = styled(VerCenterDiv)`
 const ModifyDesBox = styled(HorCenterDiv)`
     width: 100%;
     height: 20%;
-    //background-color: yellow;
     background-color: ${(props) => props.theme.defaultBaseOpaqueColor};
     border-radius: inherit;
     justify-content: flex-start;
     padding-left: 3%;
     font-size: 150%;
-    color: ${(props) => props.theme.textColors.swanWhite};
+    color: ${(props) => props.theme.spreadDefaultTextColor};
 `
 
 
 const ModifyControlBox = styled(VerCenterDiv)`
     width: 100%;
     height: 75%;
-    //background-color: orange;
     justify-content: space-evenly;
     border-radius: inherit;
     padding: 1%;
@@ -244,16 +243,13 @@ const ModifyControlBox = styled(VerCenterDiv)`
 const ModifyContent = styled(HorCenterDiv)`
     width: 100%;
     height: 80%;
-    //background-color: skyblue;
     justify-content: space-between;
     border-radius: inherit;
-
     margin-bottom: 1%;
 `
 const ModifyInputBox = styled(VerCenterDiv)`
     width: 70%;
     height: 100%;
-    background-color: aquamarine;
     background-color: ${(props) => props.theme.defaultBaseOpaqueColor};
     justify-content: space-evenly;
     border-radius: inherit;
@@ -261,31 +257,26 @@ const ModifyInputBox = styled(VerCenterDiv)`
     & div, input{
         width: 100%;
         height: 30%;
-        background-color: red;
-        padding-left: 3%;
+        background-color: inherit;
+        color: ${(props) => props.theme.spreadDefaultTextColor};
+        padding-left: 1%;
         border-radius: inherit;
         display: flex;
         justify-content: flex-start;
         align-items: center;
     }
-    & div{
-
-    }
 `
 const ModifyError = styled(HorCenterDiv)`
     width: 100%;
     height: 15%;
-    //background-color: aliceblue;
-    color: ${(props) => props.theme.textColors.swanWhite};
+    color: ${(props) => props.theme.spreadDefaultTextColor};
     padding-left: 3%;
     justify-content: flex-start;
 `
 const ModifyBtnBox = styled(VerCenterDiv)`
     width: 29%;
     height: 100%;
-    background-color: teal;
     background-color: ${(props) => props.theme.defaultBaseOpaqueColor};
-
     border-radius: inherit;
     justify-content: space-evenly;
     padding: 1%;
@@ -295,7 +286,8 @@ const ModifyBtnBox = styled(VerCenterDiv)`
         display: flex;
         justify-content: center;
         align-items: center;
-        background-color: olivedrab;
+        background-color: ${(props) => props.theme.spreadCarpet};
+        border : ${(props) => props.theme.spreadBtnDefaultborder};
         border-radius: inherit;
         cursor: pointer;
     }
@@ -336,19 +328,23 @@ const optionalBtnVar = {
         opacity: 1,
         borderRadius: '5px',
         backgroundColor: 'rgba(20, 20, 20, 0.7)',
-        color :'rgba(240, 147, 43,1.0)'
+        color :'rgba(240, 147, 43,1.0)',
+        border: '2px solid rgba(24, 220, 255, 0.3)',
+
     },
     inactive :{
         opacity: 1,
         backgroundColor: 'rgba(20, 20, 20, 0.2)',
-        border: '0px solid rgba(24, 220, 255, 0)',
-        //color :'rgba(240, 147, 43,1.0)'
-        color: 'rgba(255, 255, 255, 1)',
+        //border: '0px solid rgba(24, 220, 255, 0)',
+        //color :'rgba(240, 147, 43,1.0)',
+        border: '2px solid rgba(24, 220, 255, 0.3)',
+        color: 'rgba(72, 84, 96,1.0)',
     },
     hover:{
         backgroundColor: 'rgba(0, 0, 0, 0.5)',
         borderRadius: '5px',
         color: ['rgba(240, 147, 43,1.0)', 'rgba(83, 92, 104,1.0)', 'rgba(240, 147, 43,1.0)'],
+        border: '2px solid rgba(24, 220, 255, 0.7)',
         transition: {
             color:{
                 repeat: Infinity,
@@ -782,6 +778,35 @@ function SingleDraw() {
 
         return tempObj;
     }
+
+    const modifyBtnVar = {
+        active : {
+          opacity: 1,
+          borderRadius: '5px',
+          backgroundColor: 'rgba(20, 20, 20, 0.2)',
+          color: 'rgba(255, 255, 255, 1)',
+          border: '2px solid rgba(24, 220, 255, 0.3)',
+      },
+      inactive : {
+          opacity: 1,
+          backgroundColor: 'rgba(0, 0, 0, 0)',
+          border: '0px solid rgba(24, 220, 255, 0)',
+          color: 'rgba(83, 92, 104,1.0)'
+      },
+      hover:{
+          backgroundColor: 'rgba(0, 0, 0, 0.5)',
+          borderRadius: '5px',
+          color: ['rgba(83, 92, 104,1.0)', 'rgba(240, 147, 43,1.0)' , 'rgba(83, 92, 104,1.0)'],
+          border: '2px solid rgba(24, 220, 255, 0.7)',
+          
+          transition: {
+              color:{
+                  repeat: Infinity,
+                  duration: 1
+              }
+          }
+      },
+    }
   return (
     <SingleDrawContainer>
         <InContainer>
@@ -916,8 +941,8 @@ function SingleDraw() {
                                         variants={optionalBtnVar}
                                         initial={false}
                                         animate={sortVariants(i)}
-                                        onClick={(e) => onClickOptionalBtn(e, i)}
                                         whileHover={hoverSortVariants(i)}                                        
+                                        onClick={(e) => onClickOptionalBtn(e, i)}
                                     >
                                         {a}
                                     </OptionBtn>
@@ -964,15 +989,23 @@ function SingleDraw() {
                                         <ModifyBtnBox>
                                             <motion.div
                                                 onClick={onChangeCount}
+                                                variants={modifyBtnVar}
+                                                animate={modifyBtnVar.active}
+                                                whileHover={modifyBtnVar.hover}
                                             >
                                                 Change
                                             </motion.div>
                                             <motion.div
+                                                variants={modifyBtnVar}
+                                                animate={modifyBtnVar.active}
+                                                whileHover={modifyBtnVar.hover}
                                                 onClick={() => {
                                                     setModifyOpen(false)
                                                     setModifyErr('');
                                                 }}
-                                            >Back</motion.div>
+                                            >
+                                                Back
+                                            </motion.div>
                                         </ModifyBtnBox>
                                     </ModifyContent>
                                     <ModifyError>

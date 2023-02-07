@@ -81,7 +81,7 @@ const ExtraDeckZone = styled(HorCenterDiv)`
 
 const CardCounterBox = styled(VerCenterDiv)`
     width: 100%;
-    height: 15%;
+    height: 20%;
     background-color: ${(props) => props.theme.defaultBaseOpaqueColor};
     justify-content: space-between;
     padding: 1%;
@@ -147,7 +147,7 @@ const CardRemainNotice = styled(HorCenterDiv)`
 `
 const SpreadControlBtnBox = styled(VerCenterDiv)`
   width: 100%;
-  height: 63%;
+  height: 55%;
   background-color: ${(props) => props.theme.defaultBaseOpaqueColor};
   justify-content: space-evenly;
   padding: 1%;

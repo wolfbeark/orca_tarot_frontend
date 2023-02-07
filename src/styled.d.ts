@@ -19,6 +19,7 @@ declare module 'styled-components'{
         // Spread
         spreadCarpet : string;
         spreadDefaultTextColor : string;
+        spreadBtnDefaultborder: string;
 
         //Login
     }
