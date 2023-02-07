@@ -392,7 +392,6 @@ function SecondQuestion() {
         }
         return flag;
     }
-
     const onValidFunction = (e : React.MouseEvent<HTMLDivElement>) => {
         e.preventDefault();
         let countValid = validOracleCount();
@@ -413,6 +412,7 @@ function SecondQuestion() {
         }
         _temp.cardCount = Number(countValue);
         _temp.oracleType = oracleTypeNum;
+        
         if(oracleTypeNum === 0){
             _temp.NS_T_PreviewCard = previewCard;
             _temp.NS_T_UseAutoDeck = autoDeckTypeNum;

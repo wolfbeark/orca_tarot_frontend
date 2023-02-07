@@ -1,6 +1,6 @@
 
 // System
-export const ErrorStringArr = [
+export const ErrorStringArr : any[] = [
 ]
 
 
@@ -30,6 +30,12 @@ export const OracleCountLimitArr = [
     "1 - 36",
     "2",
     "1 - 54"
+]
+export const OracleMaxLimitArr = [
+    78,
+    36,
+    2,
+    54
 ]
 export const IChingTranslateCodeArr = [
         "111111",
@@ -97,3 +103,114 @@ export const IChingTranslateCodeArr = [
         "101010",
         "010101",
 ];
+
+export const SpreadControlBtnNameArr = ["Restart", "Hide", "Find", "Flip", "Capture"];
+
+interface IGroundZero {
+    x: number,
+    y: number,
+}
+interface ICarpetInfo {
+    width: number,
+    height: number,
+}
+export interface IAutoPosItem {
+    x : number,
+    y : number,
+}
+export const AutoDeckGenerator = (autoDeckType : number, groundZero : IGroundZero, carpetInfo : ICarpetInfo, cardNumber : number) : IAutoPosItem | null => {
+    if(autoDeckType === 0) return null;
+    let tempObjArr = [];
+    const threePosArr : IAutoPosItem[] = [
+    {
+        x : groundZero.x - carpetInfo.width * 0.2,
+        y : groundZero.y,
+    },
+    {
+        x : groundZero.x,
+        y : groundZero.y,
+    },
+    {
+        x : groundZero.x + carpetInfo.width * 0.2,
+        y : groundZero.y,
+    }
+    ];
+
+    const sevenPosArr : IAutoPosItem[] = [
+        {
+        x: groundZero.x,
+        y: groundZero.y - carpetInfo.height * 0.3,
+        },
+        {
+        x: groundZero.x + carpetInfo.width * 0.15,
+        y: groundZero.y + carpetInfo.height * 0.15,
+        },
+        {
+        x: groundZero.x - carpetInfo.width * 0.15,
+        y: groundZero.y + carpetInfo.height * 0.15,
+        },
+        {
+        x: groundZero.x,
+        y: groundZero.y + carpetInfo.height * 0.3,
+        },
+        {
+        x: groundZero.x - carpetInfo.width * 0.15,
+        y: groundZero.y - carpetInfo.height * 0.15,
+        },
+        {
+        x: groundZero.x + carpetInfo.width * 0.15,
+        y: groundZero.y - carpetInfo.height * 0.15,
+        },
+        {
+        x: groundZero.x,
+        y: groundZero.y,
+        },
+    ];
+
+    const celticPosArr : IAutoPosItem[] = [
+        {
+        x: groundZero.x - carpetInfo.width * 0.14,
+        y: groundZero.y,
+        },
+        {
+        x: groundZero.x - carpetInfo.width * 0.06,
+        y: groundZero.y,
+        },
+        {
+        x: groundZero.x - carpetInfo.width * 0.1,
+        y: groundZero.y + carpetInfo.height * 0.3,
+        },
+        {
+        x: groundZero.x - carpetInfo.width * 0.25,
+        y: groundZero.y,
+        },
+        {
+        x: groundZero.x - carpetInfo.width * 0.1,
+        y: groundZero.y - carpetInfo.height * 0.3,
+        },
+        {
+        x: groundZero.x + carpetInfo.width * 0.05,
+        y: groundZero.y,
+        },
+        {
+        x: groundZero.x + carpetInfo.width * 0.3,
+        y: groundZero.y + carpetInfo.height * 0.36,
+        },
+        {
+        x: groundZero.x + carpetInfo.width * 0.3,
+        y: groundZero.y + carpetInfo.height * 0.12,
+        },
+        {
+        x: groundZero.x + carpetInfo.width * 0.3,
+        y: groundZero.y - carpetInfo.height * 0.12,
+        },
+        {
+        x: groundZero.x + carpetInfo.width * 0.3,
+        y: groundZero.y - carpetInfo.height * 0.36,
+        },
+    ];
+    tempObjArr.push(threePosArr);
+    tempObjArr.push(sevenPosArr);
+    tempObjArr.push(celticPosArr);
+    return tempObjArr[autoDeckType - 1][cardNumber];
+}

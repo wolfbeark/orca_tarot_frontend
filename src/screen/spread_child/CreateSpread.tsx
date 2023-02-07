@@ -10,6 +10,7 @@ import FirstQuestion from 'components/spread_res/create_res/FirstQuestion'
 import SecondQuestion from 'components/spread_res/create_res/SecondQuestion'
 import { AnimatePresence } from 'framer-motion'
 import IChingMaker from 'components/spread_res/create_res/IChingMaker'
+import SingleDraw from 'components/spread_res/create_res/SingleDraw'
 
 const CreateContainer = styled(HorCenterDiv)`
     width: 100%;
@@ -46,6 +47,9 @@ function CreateSpread() {
         }
         {(createManager.creatingStep === 2 && createManager.oracleType === 2) &&
         <IChingMaker />
+        }
+        {(createManager.creatingStep === 2 && createManager.oracleType !== 2) &&
+        <SingleDraw />
         }
       </AnimatePresence>
     </CreateContainer>

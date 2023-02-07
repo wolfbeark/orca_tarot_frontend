@@ -94,6 +94,7 @@ const SecondTab = styled(VerCenterDiv)`
     left: 12%;
     //background-color: rgba(24, 220, 255, 1);
     background-color: rgba(20, 20, 20, 0.2);
+    
     justify-content: flex-start;
     //padding: 0.5%;
 
@@ -183,6 +184,7 @@ const TabBox = styled(VerCenterDiv)`
     background-color: transparent;
     justify-content: flex-start;
     align-items: flex-end;
+    //background-color: red;
 `
 
 const TabItem = styled(HorCenterDiv)`

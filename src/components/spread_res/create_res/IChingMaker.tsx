@@ -384,14 +384,25 @@ function IChingMaker() {
             oracleType : 0,
             imgNumber : 0,
             zIdx : 0,
+            isInSpread : false,
+            isDraged: false,
+            isFlip : false,
+            isRotate : false,
+            newX : 0,
+            newY : 0,
         }
         let tempObjArr : IDragCardInfo[] = [];
         let tempProject : ISingleProject = {
             projectId: 0,
             projectName: ``,
             projectType: false,
+            oracleType: 2,
             totalCardCount: 0,
+            initialCardCount : 0,
             rem_CardCount: 0,
+            NS_T_PreviewCard : null, // if normal, tarot, preview three cards
+            NS_T_UseAutoDeck : 0,
+            NS_T_PreviewCardNumArr: null,
             cardInfoArr: []
         }
         
@@ -448,7 +459,9 @@ function IChingMaker() {
         tempProject.projectId = _singleManager.singleProjectArr.length;
         tempProject.projectName = _createManager.projectName;
         tempProject.projectType = _createManager.projectType;
+        tempProject.oracleType = _createManager.oracleType;
         tempProject.totalCardCount = 2;
+        tempProject.initialCardCount = 2;
         tempProject.rem_CardCount = 2;
 
         if(!_singleManager.isExistProject) {
@@ -456,7 +469,7 @@ function IChingMaker() {
             _singleManager.cur_ProjectNumber = 0;
         }
         else{
-            _singleManager.cur_ProjectNumber++;
+            _singleManager.cur_ProjectNumber = _singleManager.singleProjectArr.length
         }
         for(let i = 0; i < 2; i++){
             let _tempObj = {...tempObj};
@@ -473,15 +486,7 @@ function IChingMaker() {
 
         _singleManager.singleProjectArr.push(tempProject);
         setSingleManager(_singleManager);
-        // console.log(tempProject.cardInfoArr);
-        // console.log(_createManager.projectName);
-        // console.log(_createManager.projectName.length);
-        // console.log(_singleManager)
-
-        //tempProject.cardInfoArr.push(tempObjArr);
-
-        //_singleManager.singleProjectArr.push(tempObjArr);
-        //console.log(_singleManager.singleProjectArr);
+        
     }
     const nextBtnHandler = (e : React.MouseEvent<HTMLDivElement>) => {
         e.preventDefault();

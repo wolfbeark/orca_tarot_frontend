@@ -28,7 +28,7 @@ function App() {
     setTotalManager(_totalManager);
   }, [])
   return (
-    <ThemeProvider theme={!themeValue ? LightTheme : DarkTheme}>
+    <ThemeProvider theme={!themeValue ? DarkTheme : LightTheme}>
       <AppContainer>
         {
           location.pathname !== '/login'

@@ -65,6 +65,11 @@ const GlobalStyles = createGlobalStyle`
     box-sizing: border-box;
     font-family: "Jua";
     font-size: 100%;
+    -ms-user-select: none;
+    -moz-user-select: -moz-none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    user-select: none;
   }
   
   button{
