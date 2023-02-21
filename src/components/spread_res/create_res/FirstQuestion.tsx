@@ -108,6 +108,7 @@ function FirstQuestion() {
     }
     const changeManager = (e : React.MouseEvent<HTMLDivElement>) => {
         let _tempObj : ICreateControlManager = JSON.parse(JSON.stringify(createManager));
+        if(!_tempObj.isCreating) _tempObj.isCreating = true;
         _tempObj.creatingStep = 1;
         _tempObj.projectType = isMulti;
         _tempObj.isSandbox = isSandbox;

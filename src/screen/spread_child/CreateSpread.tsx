@@ -11,6 +11,9 @@ import SecondQuestion from 'components/spread_res/create_res/SecondQuestion'
 import { AnimatePresence } from 'framer-motion'
 import IChingMaker from 'components/spread_res/create_res/IChingMaker'
 import SingleDraw from 'components/spread_res/create_res/SingleDraw'
+import DrawPannel from 'components/spread_res/create_res/draw_res/DrawPannel'
+import { EWhatDrawMode } from 'components/spread_res/create_res/draw_res/DrawPannel.interfaces'
+import DrawIChingPannel from 'components/spread_res/create_res/draw_res/iching_res/DrawIChingPannel'
 
 const CreateContainer = styled(HorCenterDiv)`
     width: 100%;
@@ -41,15 +44,24 @@ function CreateSpread() {
         >
           <FirstQuestion />
         </QuestionBox>
-        }
+        } 
         {createManager.creatingStep === 1 &&
         <SecondQuestion />
         }
         {(createManager.creatingStep === 2 && createManager.oracleType === 2) &&
-        <IChingMaker />
+        <DrawIChingPannel 
+          whatDrawMode={EWhatDrawMode.SINGLE}
+          oracleType={createManager.oracleType}
+        />
         }
-        {(createManager.creatingStep === 2 && createManager.oracleType !== 2) &&
+        {/* {(createManager.creatingStep === 2 && createManager.oracleType !== 2) &&
         <SingleDraw />
+        } */}
+        {(createManager.creatingStep === 2 && createManager.oracleType !== 2) &&
+        <DrawPannel 
+          whatDrawMode={EWhatDrawMode.SINGLE}
+          oracleType={createManager.oracleType}
+        />
         }
       </AnimatePresence>
     </CreateContainer>

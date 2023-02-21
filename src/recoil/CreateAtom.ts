@@ -22,7 +22,7 @@ export interface ICreateControlManager {
 export const createControlManager = atom<ICreateControlManager>({
     key: "createControlManager",
     default: {
-        isCreating : true,
+        isCreating : false, // 2023.02.21 원래 true였음
         isLoading : false,
         creatingStep: 0,
         projectType: null, // f
@@ -45,7 +45,7 @@ ex) normal, single, only tarot : NS_T_UseAutoDeck
 /*
 expect common values
 1. isCreating : boolean
-2. isLoading : boolean -> When the production is completed, false -> true
+2. isLoading : boolean -> When the production is completed, false -> false
 3. cardCount : number
 4. oracleType : EOracleType
 5.

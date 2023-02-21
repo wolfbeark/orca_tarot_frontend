@@ -188,7 +188,7 @@ function TopNavBar(props : ITopNavBar) {
                         }
                     </MenuBtn>
                 </Link>
-                <Link to="/multi">
+                {/* <Link to="/multi">
                     <MenuBtn
                         variants={MenuBtnVar}
                         initial={false}
@@ -200,7 +200,7 @@ function TopNavBar(props : ITopNavBar) {
                             <HighlightBtn layoutId="highLightNav"></HighlightBtn>
                         }
                     </MenuBtn>
-                </Link>
+                </Link> */}
                 <Link to="/manual">
                     <MenuBtn
                         variants={MenuBtnVar}

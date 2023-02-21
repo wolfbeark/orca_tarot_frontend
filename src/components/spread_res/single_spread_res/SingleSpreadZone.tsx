@@ -9,6 +9,8 @@ import { ISingleControlManagerAtom, singleControlManagerAtom } from 'recoil/Sing
 import DragCard from '../DragCard';
 import { ICustomDOMPosition, IPositionInfo, PositionValueObj } from 'common_resources/CommonInterfaces';
 import { SpreadControlBtnNameArr } from 'common_resources/CommonData';
+import MakeExtraPannel from './MakeExtraPannel/MakeExtraPannel';
+import html2canvas from 'html2canvas';
 
 interface IPreviewContainer {
     positioninfo? : IPositionInfo,
@@ -20,6 +22,7 @@ const SingleSpreadContainer = styled(HorCenterDiv)`
   height: 100%;
   justify-content: flex-end;
   padding-right: 0.5%;
+  position: relative;
 `
 const InSingleSpreadZone = styled(HorCenterDiv)`
   width: 95%;
@@ -249,6 +252,14 @@ const ExtraBtnBox = styled(HorCenterDiv)<IPreviewContainer>`
   background-size: 100% 100%;
   cursor: pointer;
 `
+
+const TestExtraBox = styled(HorCenterDiv)`
+  width: 100%;
+  height: 100%;
+  background-color: yellow;
+  position: absolute;
+  opacity: 0.5;
+`
 function SingleSpreadZone() {
 
     const [singleManager, setSingleManager] = useRecoilState(singleControlManagerAtom);
@@ -269,6 +280,8 @@ function SingleSpreadZone() {
     const [previewOpen, setPreviewOpen] = useState<boolean>(false);
     const [refArr, setRefArr] = useState<React.MutableRefObject<HTMLDivElement>[]>([totalRef, carpetRef]);
     
+    // 2023.02.13 수술중
+    const [isOpenExtraMake, setIsOpenExtraMake] = useState<boolean>(false);
     useLayoutEffect(()=> {
       if(singleProjectArr[cur_ProjectNumber].NS_T_PreviewCard){
         let _tempArr : string[] = []
@@ -337,6 +350,9 @@ function SingleSpreadZone() {
         .cardInfoArr = _cardInfoArr;
         setSingleManager(_singleManager);
       }
+      else if(type === 4){
+        onCaptureHandler();
+      }
     }
 
     const optionalBtnVar = {
@@ -376,12 +392,53 @@ function SingleSpreadZone() {
               duration: 0.3
           }
       }
-  }
+    }
+
+    const onCaptureHandler = () => {
+      
+      let today = new Date();
+      let year = today.getFullYear();
+      let month = ('0' + (today.getMonth() + 1)).slice(-2);
+      let day = ('0' + today.getDate()).slice(-2);
+      let dateString = year + month + day;
+
+      let projectName = singleProjectArr[cur_ProjectNumber].projectName;
+      let projectType = singleProjectArr[cur_ProjectNumber].projectType === false ? "Normal" : "Sandbox";
+      let _id = singleProjectArr[cur_ProjectNumber].projectId;
+
+      let tempName : string = dateString + '_' + projectType + _id + '_' + projectName + '.png';
+        // if (customFileName === "") {
+        //   tempName = "image-download.png";
+        // } else {
+        //   tempName = `${customFileName}.png`;
+        // }
+        //console.log(tempName);
+        html2canvas(document.getElementById("singleSpreadZone")).then(
+          (canvas) => {
+            onSaveAs(canvas.toDataURL("image/png"), tempName);
+          }
+          //"image-download.png"
+        );
+      };
+      const onSaveAs = (uri : any, filename : any) => {
+        //console.log('onSaveAs');
+        let link = document.createElement("a");
+        document.body.appendChild(link);
+        link.href = uri;
+        link.download = filename;
+        //link.style.zIndex = "1000";
+        //link.style.position = "absolute";
+        //console.dir(link);
+        link.click();
+        document.body.removeChild(link);
+        //window.location.reload();
+      };
 
   return (
     <SingleSpreadContainer>
         <InSingleSpreadZone
             ref={totalRef}
+            id="singleSpreadZone"
         >
           <SpreadCarpet
             ref={carpetRef}
@@ -469,6 +526,11 @@ function SingleSpreadZone() {
                         animate={{opacity: 1}}
                         exit={{opacity: 0}} 
                         imgsrc={`${process.env.PUBLIC_URL}/images/BackOfCards/BackOfCard0.png`}
+                        onClick={(e) => {
+                          e.preventDefault();
+                          if(singleProjectArr[cur_ProjectNumber].rem_CardCount !== 0) return;
+                          setIsOpenExtraMake(true);
+                        }}
                       />
                     }
                   </AnimatePresence>
@@ -516,6 +578,13 @@ function SingleSpreadZone() {
             </SpreadControlBtnBox>
           </SpreadControl>
         </InSingleSpreadZone>
+        <AnimatePresence>
+          {isOpenExtraMake &&
+          <MakeExtraPannel 
+            setIsOpenExtraMake={setIsOpenExtraMake}
+          />
+          }
+        </AnimatePresence>
       </SingleSpreadContainer>
   )
 }

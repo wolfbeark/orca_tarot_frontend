@@ -525,8 +525,7 @@ function SingleDraw() {
             setClickArr(_tempArr);
             setSelectCount(_count);
             setSelectedNumArr(_selectedArr);
-        }
-        
+        } 
     }
 
     const onClickOptionalBtn = (e : React.MouseEvent<HTMLDivElement>, type : number) => {
@@ -675,6 +674,11 @@ function SingleDraw() {
                     ){
                         _tempObj.isInSpread = true;
                         _tempObj.zIdx = 0;
+                        if(_createManager.NS_T_UseAutoDeck === 3
+                            && i === 1
+                        ){
+                            _tempObj.isRotate = true;
+                        }
                     }
                     tempObjArr[i] = _tempObj;
                 }

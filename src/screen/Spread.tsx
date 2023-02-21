@@ -161,6 +161,8 @@ const SecondTabItem = styled(HorCenterDiv)`
     position: relative;
     cursor: pointer;
     margin-bottom: 5%;
+    font-weight: 600;
+    letter-spacing: 0.05em;
 `
 
 
@@ -335,6 +337,7 @@ function Spread() {
     const secondTabVar = {
         initial:{
             width: `${foldWidth}px`,
+            backgroundColor: `rgba(20, 20, 20, 0)`,
         },
         inactive : {
             width: `${foldWidth}px`,

@@ -10,6 +10,8 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { Typing } from 'components/common_res/typing_res/Typing';
 import { ISpreadTotal } from 'components/spread_res/SpreadTotal';
 import SingleSpreadZone from 'components/spread_res/single_spread_res/SingleSpreadZone';
+import { createControlManager, ICreateControlManager } from 'recoil/CreateAtom';
+import { ITotalManagerAtom, totalManagerAtom } from 'recoil/TotalAtom';
 
 const SingleContainer = styled(HorCenterDiv)`
     width: 100%;
@@ -92,20 +94,29 @@ const TypingBox = styled(VerCenterDiv)`
 
 function SingleSpread() {
   const navigate = useNavigate();
+  const [totalManager, setTotalManager] = useRecoilState<ITotalManagerAtom>(totalManagerAtom);
   const [singleManager, setSingleManager] = useRecoilState(singleControlManagerAtom);
+  const [createManager, setCreateManager] = useRecoilState<ICreateControlManager>(createControlManager)
   const spreadProps = useOutletContext<ISpreadTotal>();
   const linkToCreateHandler = (e : React.MouseEvent<HTMLDivElement>) => {
         e.preventDefault();
         //setTabNumber(3);
+        let _temp = JSON.parse(JSON.stringify(createManager));
+        _temp.isCreating = true;
+        setCreateManager(_temp);
         spreadProps.setTabNumber(3);
         navigate('/spread/create')
   }
 
+  const moveToCrate = (e : React.MouseEvent<HTMLDivElement>) => {
+        e.preventDefault();
+        navigate('/spread/create')
+    }
   return (
     <SingleContainer>
       <InSingleContainer>
       <AnimatePresence>
-      {!singleManager.isExistProject &&
+      {(!singleManager.isExistProject && !createManager.isCreating) &&
       <ProjectAllEmptyBox>
         <div>
           <TypingBox>
@@ -140,6 +151,48 @@ function SingleSpread() {
                 onClick={(e)=> linkToCreateHandler(e)}
               >
                 Create
+            </motion.div>
+          </LinkToCreateBtn>
+        </div>
+      </ProjectAllEmptyBox>
+      }
+      </AnimatePresence>
+      <AnimatePresence>
+      {(!totalManager.projectCount && createManager.isCreating) &&
+      <ProjectAllEmptyBox>
+        <div>
+          <TypingBox>
+              <Typing
+                  text={"A project is under construction"}
+                  letterSpacing={0.1}
+                  cursorThickness={0}
+                  typeSpeed={3}
+              />
+              <Typing 
+                  text={"Move to create"}
+                  letterSpacing={0.1}
+                  typeSpeed={3}
+                  cursorThickness={0}
+              />
+          </TypingBox>
+          <LinkToCreateBtn>
+              <motion.div
+                  initial={{
+                    opacity: 0
+                  }}
+                  animate={{
+                    opacity: 1,
+                    color: ['rgba(240, 147, 43,1.0)', 'rgba(240, 147, 43, 0.2)','rgba(240, 147, 43,1.0)'],
+                    transition: {
+                        color:{
+                            repeat: Infinity,
+                            duration: 1.5
+                        }
+                    }
+                }} 
+                onClick={(e)=> moveToCrate(e)}
+              >
+                Move
             </motion.div>
           </LinkToCreateBtn>
         </div>

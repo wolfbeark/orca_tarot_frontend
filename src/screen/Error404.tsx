@@ -1,6 +1,6 @@
 /* eslint-disable */
 
-import React, {useState, useEffect} from 'react'
+import React, {useState, useEffect, useLayoutEffect} from 'react'
 import styled from 'styled-components';
 import {motion} from 'framer-motion';
 
@@ -180,9 +180,16 @@ const fadeOutVar = {
 function Error404() {
 
   //const [isArrive, setIsArrive] = useState<boolean>(false);
+  const [defaultImg, setDefaultImg] = useState<string>('/images/NotFoundImg.png');
 
   const navigate = useNavigate();
 
+  useLayoutEffect(()=>{
+    let img = new Image();
+    let path = '/images/NotFoundImg.png';
+    img.src = path;
+    setDefaultImg(path);
+  }, [])
   
   useEffect(()=> {
     let time = setTimeout(()=>{navigate('/')}, 5000);
@@ -216,7 +223,7 @@ function Error404() {
           <Loader.PuffLoader size={100} color='rgba(238, 90, 36,1.0)'></Loader.PuffLoader>
         </ContentBox>
         <ImageBox
-          imgsrc={`${process.env.PUBLIC_URL}/images/NotFoundImg.png`}
+          imgsrc={`${process.env.PUBLIC_URL}${defaultImg}`}
         ></ImageBox>
         <CrossBox></CrossBox>
       </InContainer>

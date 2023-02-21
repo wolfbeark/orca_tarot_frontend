@@ -33,6 +33,8 @@ export const LightTheme : DefaultTheme = {
     spreadDefaultTextColor: "rgba(30, 39, 46,1.0)",
     spreadBtnDefaultborder: '2px solid rgba(24, 220, 255, 0.3)',
 
+    spreadBtnTextColor : 'rgba(240, 147, 43,1.0)'
+
 }
 export const DarkTheme : DefaultTheme = {
     engFont: "Anton",
@@ -51,6 +53,7 @@ export const DarkTheme : DefaultTheme = {
     spreadDefaultTextColor: "rgba(247, 241, 227,1.0)",
     spreadBtnDefaultborder: '2px solid rgba(24, 220, 255, 0.3)',
 
+    spreadBtnTextColor : 'rgba(240, 147, 43,1.0)'
 }
 
 // export const BlackRedTheme : DefaultTheme = {

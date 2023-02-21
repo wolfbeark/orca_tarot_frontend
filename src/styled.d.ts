@@ -21,6 +21,7 @@ declare module 'styled-components'{
         spreadDefaultTextColor : string;
         spreadBtnDefaultborder: string;
 
+        spreadBtnTextColor : string;
         //Login
     }
 }

@@ -8,160 +8,32 @@ import { ITotalManagerAtom, totalManagerAtom } from 'recoil/TotalAtom';
 import { Link, useNavigate } from 'react-router-dom';
 import { Typing } from 'components/common_res/typing_res/Typing';
 
+import { 
+    SpreadTotal_Common 
+} from './SpreadTotal.styled';
+import TotalSingleList from './single_spread_res/TotalSingleList';
+import { createControlManager, ICreateControlManager } from 'recoil/CreateAtom';
+
 export interface ISpreadTotal {
     setTabNumber : Dispatch<SetStateAction<number>>;
 }
 
-const SpreadTotalContainer = styled(HorCenterDiv)`
-    width: 100%;
-    height: 100%;
-    //background-color: skyblue;
-    font-family: ${(props) => props.theme.engFont};
-    position: relative;
-`
-const ProjectAllEmptyBox = styled(VerCenterDiv)`
-    width: 40%;
-    height: 50%;
-    background-color: ${(props) => props.theme.boxColors.opaqueBlack};
-    border-radius: ${(props) => props.theme.borders.small};
-    padding: 0.5%;
-    & > div{
-        width: 100%;
-        height: 100%;
-        border-radius: inherit;
-        background-color: inherit;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        flex-direction: column;
-    }
-    /* & span{
-        width: 100%;
-        height: 20%;
-        background-color: blue;
-    } */
-`
-
-const LinkToCreateBtn = styled(HorCenterDiv)`
-    width: 30%;
-    height: 20%;
-    background-color: ${(props) => props.theme.boxColors.soaring};
-    border-radius: ${(props)=> props.theme.borders.small};
-    padding: 1%;
-    div {
-        width: 100%;
-        height: 100%;
-        background-color: inherit;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        border-radius: inherit;
-        cursor: pointer;
-        font-size: 100%;
-        color: white;
-    }
-`
-
-const TypingBox = styled(VerCenterDiv)`
-    width: 70%;
-    height: 40%;
-    background-color: transparent;
-    align-items: flex-start;
-    justify-content: space-evenly;
-    padding-left: 5%;
-    & span:first-child {
-        font-size: 170%;
-        width: 100%;
-        height: 40%;
-        color: ${(props) => props.theme.textColors.swanWhite};
-    }
-    & span:last-child {
-        font-size: 130%;
-    }
-`
-
-const TotalNoticeBoard = styled(VerCenterDiv)`
-    width: 80%;
-    height: 95%;
-    background-color: ${(props) => props.theme.boxColors.opaqueBlack};
-    position: absolute;
-    right: 5%;
-    border-radius: ${(props) => props.theme.borders.small};
-    padding: 0.5%;
-`
-const InTotalNoticeBoard = styled(VerCenterDiv)`
-    width: 100%;
-    height: 100%;
-    background-color: inherit;
-    border-radius: inherit;
-    justify-content: space-between;
-    //padding: 1%;
-`
-const NoticeTypingBox = styled(HorCenterDiv)`
-    width: 100%;
-    height: 12%;
-    //background-color: gray;
-    padding-left: 2%;
-    justify-content: flex-start;
-    user-select: none;
-     & span:first-child {
-        font-size: 180%;
-        width: 100%;
-        height: 40%;
-        color: ${(props) => props.theme.textColors.swanWhite};
-    }
-`
-const NoticeContentBox = styled(VerCenterDiv)`
-    width: 100%;
-    height: 87%;
-    padding-left: 2%;
-    justify-content: space-between;
-    
-`
-const SpreadModeTabsContainer = styled(HorCenterDiv)`
-    width: 100%;
-    height: 10%;
-    padding: 0.5% 0.5% 0% 0;
-    justify-content: flex-start;
-`
-const SpreadNoticeContentBox = styled(HorCenterDiv)`
-    width: 100%;
-    height: 89%;
-    background-color: olive;
-    border: 2px solid rgba(24, 220, 255, 0.7);
-    border-radius: ${(props) => props.theme.borders.small};
-`
-const ModeTabItem = styled(HorCenterDiv)`
-    width: 15%;
-    height: 100%;
-    background-color: ${(props) => props.theme.boxColors.opaqueBlack};
-    margin-right: 1%;
-    border-radius: ${(props) => props.theme.borders.small};
-    cursor: pointer;
-    user-select: none;
-`
-const tabItemVar = {
-    // initial:{
-    //     backgroundColor: 'rgba(23, 65, 234, 1)'
-    // },
-    active: {
-        backgroundColor: 'rgba(23, 65, 234, 1)'
-    },
-    inactive: {
-        backgroundColor: 'rgba(23, 65, 24, 0.2)'
-    }
-}
+const {tabItemVar} = SpreadTotal_Common;
 
 
 function SpreadTotal({setTabNumber} : ISpreadTotal) {
 
     const navigate = useNavigate();
     const [totalManager, setTotalManager] = useRecoilState(totalManagerAtom);
+    const [createManager, setCreateManager] = useRecoilState<ICreateControlManager>(createControlManager);
     //const [currentTabNum, setCurrentTabNum] = useState<number>(totalManager.currentTabNumber);
     
     const tabNameArr = ["TOTAL", "SINGLE", "MULTI"]
     const linkToCreateHandler = (e : React.MouseEvent<HTMLDivElement>) => {
         e.preventDefault();
+        let _temp = JSON.parse(JSON.stringify(createManager));
+        _temp.isCreating = true;
+        setCreateManager(_temp);
         setTabNumber(3);
         navigate('create')
     }
@@ -178,12 +50,18 @@ function SpreadTotal({setTabNumber} : ISpreadTotal) {
         _temp.currentTabNumber = num;
         setTotalManager(_temp);
     }
+    const moveToCrate = (e : React.MouseEvent<HTMLDivElement>) => {
+        e.preventDefault();
+        navigate('create')
+    }
+
+    const {optionalBtnVar} = SpreadTotal_Common
   return (
-    <SpreadTotalContainer>
-        {!totalManager.projectCount && 
-        <ProjectAllEmptyBox>
+    <SpreadTotal_Common.Container>
+        {(!totalManager.projectCount && !createManager.isCreating) &&
+        <SpreadTotal_Common.ProjectAllEmptyBox>
             <div>
-                <TypingBox>
+                <SpreadTotal_Common.TypingBox>
                     <Typing
                         text={"No spread was created"}
                         letterSpacing={0.1}
@@ -196,8 +74,8 @@ function SpreadTotal({setTabNumber} : ISpreadTotal) {
                         typeSpeed={3}
                         cursorThickness={0}
                     />
-                </TypingBox>
-            <LinkToCreateBtn>
+                </SpreadTotal_Common.TypingBox>
+            <SpreadTotal_Common.LinkToCreateBtn>
                 <motion.div
                     initial={{
                     opacity: 0
@@ -216,54 +94,107 @@ function SpreadTotal({setTabNumber} : ISpreadTotal) {
                 >
                     Create
                 </motion.div>
-            </LinkToCreateBtn>
+            </SpreadTotal_Common.LinkToCreateBtn>
             </div>
-        </ProjectAllEmptyBox>
+        </SpreadTotal_Common.ProjectAllEmptyBox>
+        }
+        {(!totalManager.projectCount && createManager.isCreating) &&
+        <SpreadTotal_Common.ProjectAllEmptyBox>
+            <div>
+                <SpreadTotal_Common.TypingBox>
+                    <Typing
+                        text={"A project is under construction"}
+                        letterSpacing={0.1}
+                        cursorThickness={0}
+                        typeSpeed={3}
+                    />
+                    <Typing 
+                        text={"Move to create"}
+                        letterSpacing={0.1}
+                        typeSpeed={3}
+                        cursorThickness={0}
+                    />
+                </SpreadTotal_Common.TypingBox>
+            <SpreadTotal_Common.LinkToCreateBtn>
+                <motion.div
+                    initial={{
+                    opacity: 0
+                    }}
+                    animate={{
+                        opacity: 1,
+                        color: ['rgba(240, 147, 43,1.0)', 'rgba(240, 147, 43, 0.2)','rgba(240, 147, 43,1.0)'],
+                        transition: {
+                            color:{
+                                repeat: Infinity,
+                                duration: 1.5
+                            }
+                        }
+                    }} 
+                    onClick={moveToCrate}
+                >
+                    Move
+                </motion.div>
+            </SpreadTotal_Common.LinkToCreateBtn>
+            </div>
+        </SpreadTotal_Common.ProjectAllEmptyBox>
         }
         {totalManager.projectCount > 0 &&
-            <TotalNoticeBoard>
-                <InTotalNoticeBoard>
-                    <NoticeTypingBox>
+            <SpreadTotal_Common.TotalNoticeBoard>
+                <SpreadTotal_Common.InTotalNoticeBoard>
+                    <SpreadTotal_Common.NoticeTypingBox>
                         <Typing
                             text={"Controllers for all spreads"}
                             letterSpacing={0.1}
                             cursorThickness={0}
                             typeSpeed={3}
                         />
-                    </NoticeTypingBox>
-                    <NoticeContentBox>
-                        <SpreadModeTabsContainer>
+                    </SpreadTotal_Common.NoticeTypingBox>
+                    <SpreadTotal_Common.NoticeContentBox>
+                        <SpreadTotal_Common.SpreadModeTabsContainer>
                         {
                             tabNameArr.map((a, i) => {
                             return(
-                                <ModeTabItem
+                                <SpreadTotal_Common.ModeTabItem
                                     key={`totalContentTab${a}${i}`}
-                                    variants={tabItemVar}
+                                    variants={optionalBtnVar}
                                     //initial={tabItemVar.initial}
                                     animate={
                                         i === totalManager.currentTabNumber
-                                        ? tabItemVar.active
-                                        : tabItemVar.inactive
+                                        ? optionalBtnVar.active
+                                        : optionalBtnVar.inactive
                                     }
                                     onClick={(e) => chnageTabNumberHandler(e, i)}
-                                >{a}</ModeTabItem>
+                                >{a}
+                                {
+                                    i === totalManager.currentTabNumber &&
+                                    <AnimatePresence>
+                                        <SpreadTotal_Common.RedCircle
+                                            initial={{opacity: 0}}
+                                            animate={{opacity: 1}}
+                                            exit={{opacity: 0}}
+                                            layoutId='spreadTotalTabCircle'
+                                        />
+                                    </AnimatePresence>
+
+                                }
+                                </SpreadTotal_Common.ModeTabItem>
                             );
                             })
                         }
-                        </SpreadModeTabsContainer>
-                        <SpreadNoticeContentBox>
+                        </SpreadTotal_Common.SpreadModeTabsContainer> 
+                        <SpreadTotal_Common.SpreadNoticeContentBox>
                             <AnimatePresence>
                             {
                                 totalManager.currentTabNumber === 1 &&
-                                <div>{totalManager.currentTabNumber}</div>
+                                <TotalSingleList />
                             }
                             </AnimatePresence>
-                        </SpreadNoticeContentBox>
-                    </NoticeContentBox>
-                </InTotalNoticeBoard>
-            </TotalNoticeBoard>
+                        </SpreadTotal_Common.SpreadNoticeContentBox>
+                    </SpreadTotal_Common.NoticeContentBox>
+                </SpreadTotal_Common.InTotalNoticeBoard>
+            </SpreadTotal_Common.TotalNoticeBoard>
         }
-    </SpreadTotalContainer>
+    </SpreadTotal_Common.Container>
   )
 }
 

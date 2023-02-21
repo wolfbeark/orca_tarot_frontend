@@ -8,7 +8,6 @@ import { ISingleControlManagerAtom, singleControlManagerAtom } from 'recoil/Sing
 import { ICustomDOMPosition, IPositionInfo } from 'common_resources/CommonInterfaces';
 import Draggable from 'react-draggable';
 import { AutoDeckGenerator, IAutoPosItem } from 'common_resources/CommonData';
-import { resourceUsage } from 'process';
 
 
 // styled
@@ -188,9 +187,6 @@ function DragCard(props : IDragCard) {
         }
 
     }, [singleManager])
-    // useEffect(()=>{
-        
-    // }, [singleManager])
 
     const onDragStartHandler = (e : MouseEvent) => {
         e.preventDefault();
@@ -322,7 +318,20 @@ function DragCard(props : IDragCard) {
                     }
                 }
                 else{ // Extra
-
+                    if(cardInfoArr[cardNumber].isInSpread === false){
+                        tempObj = {
+                            zIndex : cardInfoArr[cardNumber].zIdx,
+                            //x : cardInfoArr[cardNumber].newX,
+                            //y : cardInfoArr[cardNumber].newY,
+                        }
+                    }
+                    else if(cardInfoArr[cardNumber].isInSpread === true){
+                        tempObj = {
+                            x : cardInfoArr[cardNumber].newX,
+                            y : cardInfoArr[cardNumber].newY,
+                            zIndex : 0
+                        }
+                    }
                 }
             }
             else{ // Free Deck
@@ -350,13 +359,13 @@ function DragCard(props : IDragCard) {
                         //y : cardInfoArr[cardNumber].newY,
                     }
                 }
-                else if(cardInfoArr[cardNumber].isInSpread === true){
-                    tempObj = {
-                        x : cardInfoArr[cardNumber].newX,
-                        y : cardInfoArr[cardNumber].newY,
-                        zIndex : 0
-                    }
+            else if(cardInfoArr[cardNumber].isInSpread === true){
+                tempObj = {
+                    x : cardInfoArr[cardNumber].newX,
+                    y : cardInfoArr[cardNumber].newY,
+                    zIndex : 0
                 }
+            }
         }
 
         return tempObj;
@@ -482,7 +491,6 @@ function DragCard(props : IDragCard) {
             whileHover={
                 containerVar.hover
             }
-            
         >
             <AnimatePresence>
                 <motion.div
@@ -505,7 +513,6 @@ function DragCard(props : IDragCard) {
                             width: `${waitingInfo.width - (waitingInfo.width * 0.05)}px`,
                             height: `${waitingInfo.height - (waitingInfo.width * 0.05)}px`,
                         }}
-                        
                     >
                     </motion.div>
                 </motion.div>

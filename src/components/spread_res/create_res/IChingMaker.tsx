@@ -366,10 +366,10 @@ function IChingMaker() {
     const translateIChingCode = (str : string) : number => {
         let imgnum = 0;
         for (let i = 0; i < IChingTranslateCodeArr.length; i++) {
-        if (IChingTranslateCodeArr[i] === str) {
-            imgnum = i;
-            break;
-        }
+            if (IChingTranslateCodeArr[i] === str) {
+                imgnum = i;
+                break;
+            }
         }
         return imgnum;
     };

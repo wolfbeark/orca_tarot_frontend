@@ -33,3 +33,7 @@ export interface IPositionInfo{
     gapX : number;
     gapY : number;
 }
+
+export interface IHaveImageBoxProps {
+    imgsrc : string;
+}

@@ -6,6 +6,30 @@ export const ErrorStringArr : any[] = [
 
 // Deck
 // Name
+interface IDeckInfoItem { 
+    name : string;
+    defaultImage : string
+}
+export const DeckInfoArr : IDeckInfoItem[] = [
+    {
+        name : "TAROT",
+        defaultImage : "/images/TarotDefault/Default0.png" 
+    },
+    {
+        name : "LENORMAND",
+        defaultImage : "/images/LenormandDefault/Default_Lenormand0.png", 
+
+    },
+    {
+        name : "ICHING",
+        defaultImage : "/images/IChingDefault/iching0.png" 
+
+    },
+    {
+        name : "POKER",
+        defaultImage : "/images/PokerDefault/Default_Poker53.png", 
+    }
+]
 export const DeckNameArr = [
     "TAROT",
     "LENORMAND",
@@ -169,12 +193,12 @@ export const AutoDeckGenerator = (autoDeckType : number, groundZero : IGroundZer
 
     const celticPosArr : IAutoPosItem[] = [
         {
-        x: groundZero.x - carpetInfo.width * 0.14,
-        y: groundZero.y,
+        x: groundZero.x - carpetInfo.width * 0.1,
+        y: groundZero.y - carpetInfo.height * 0.05,
         },
         {
-        x: groundZero.x - carpetInfo.width * 0.06,
-        y: groundZero.y,
+        x: groundZero.x - carpetInfo.width * 0.1,
+        y: groundZero.y + carpetInfo.height * 0.125,
         },
         {
         x: groundZero.x - carpetInfo.width * 0.1,
