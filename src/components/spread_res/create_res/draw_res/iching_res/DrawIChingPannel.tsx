@@ -2,7 +2,7 @@
 import React, {useEffect, useState} from 'react'
 import { useRecoilState, useResetRecoilState } from 'recoil';
 import { ITotalManagerAtom, totalManagerAtom } from 'recoil/TotalAtom';
-import { IDragCardInfo, ISingleControlManagerAtom, ISingleProject, singleControlManagerAtom } from 'recoil/SingleAtom';
+import { defaultRestartInfo, IDragCardInfo, ISingleControlManagerAtom, ISingleProject, singleControlManagerAtom } from 'recoil/SingleAtom';
 import { createControlManager, ICreateControlManager } from 'recoil/CreateAtom';
 
 import { 
@@ -43,7 +43,7 @@ function DrawIChingPannel(props : IDrawPannelProps) {
     } = DrawCommonInfo;
 
     const [totalManager, setTotalManager] = useRecoilState(totalManagerAtom);
-    const [createManager, setCreateManager] = useRecoilState(createControlManager);
+    const [createManager, setCreateManager] = useRecoilState<ICreateControlManager>(createControlManager);
     const resetCreateManager = useResetRecoilState(createControlManager);
     const [singleManager, setSingleManager] = useRecoilState(singleControlManagerAtom);
     
@@ -84,6 +84,41 @@ function DrawIChingPannel(props : IDrawPannelProps) {
     const [stateNotice, setStateNotice] = useState<string>('Your cards are ready to be drawn')
     const [cardText, setCardText] = useState<string>(`Waiting for order`);
 
+    useEffect(() => {
+        if(whatDrawMode === EWhatDrawMode.SINGLE){
+            if(createManager.tempRanNumArr.length > 1){
+                setImgNumInfo({
+                    leftNum : createManager.tempRanNumArr[0],
+                    rightNum : createManager.tempRanNumArr[1],
+                })
+                setIsClickedMake(true);
+                setActiveNextBtn(true);
+                setStateNotice(`Processing completed`)
+                setCardText(`Ready`);
+            }
+
+        }
+        else if(whatDrawMode === EWhatDrawMode.SINGLE_RESTART){
+            let _singleManager : ISingleControlManagerAtom = JSON.parse(JSON.stringify(singleManager));
+            let {
+                cur_ProjectNumber,
+                singleProjectArr
+            } = _singleManager;
+            if(singleProjectArr[cur_ProjectNumber]
+                .restartInfo.tempRanNumArr.length > 1){
+                setImgNumInfo({
+                    leftNum : singleProjectArr[cur_ProjectNumber]
+                        .restartInfo.tempRanNumArr[0],
+                    rightNum : singleProjectArr[cur_ProjectNumber]
+                        .restartInfo.tempRanNumArr[1],
+                })
+                setIsClickedMake(true);
+                setActiveNextBtn(true);
+                setStateNotice(`Processing completed`)
+                setCardText(`Ready`);
+            }
+        }
+    }, [])
     // Common functions
     const flagChecker = () : number => {
         let tempNum : number;
@@ -115,7 +150,8 @@ function DrawIChingPannel(props : IDrawPannelProps) {
     const onStartHandler = (e : React.MouseEvent<HTMLDivElement>) => {
         e.preventDefault();
         if(whatDrawMode === EWhatDrawMode.SINGLE ||
-            whatDrawMode === EWhatDrawMode.SINGLE_EXTRA
+            whatDrawMode === EWhatDrawMode.SINGLE_EXTRA ||
+            whatDrawMode === EWhatDrawMode.SINGLE_RESTART 
             ){
             singleNormalMake();
         }
@@ -131,6 +167,9 @@ function DrawIChingPannel(props : IDrawPannelProps) {
         else if(whatDrawMode === EWhatDrawMode.SINGLE_EXTRA){
             extra_singleNoramlPrev();
         }
+        else if(whatDrawMode === EWhatDrawMode.SINGLE_RESTART){
+            restart_singleNoramlPrev();
+        }
     }
     const nextBtnHandler = (e : React.MouseEvent<HTMLDivElement>) => {
         e.preventDefault();
@@ -139,6 +178,9 @@ function DrawIChingPannel(props : IDrawPannelProps) {
         }
         else if(whatDrawMode === EWhatDrawMode.SINGLE_EXTRA){
             extra_singleNextHandler();
+        }
+        else if(whatDrawMode === EWhatDrawMode.SINGLE_RESTART){
+            restart_singleNextHandler();
         }
     }
 
@@ -210,6 +252,32 @@ function DrawIChingPannel(props : IDrawPannelProps) {
             leftNum,
             rightNum
         })
+        if(whatDrawMode === EWhatDrawMode.SINGLE){
+            if(createManager.tempRanNumArr.length > 1) return;
+            let _createManager : ICreateControlManager = JSON.parse(JSON.stringify(createManager));
+            _createManager.tempRanNumArr.push(leftNum);
+            _createManager.tempRanNumArr.push(rightNum);
+            setCreateManager(_createManager);
+        }
+        else if(whatDrawMode === EWhatDrawMode.SINGLE_RESTART){
+            let _singleManager : ISingleControlManagerAtom = JSON.parse(JSON.stringify(singleManager));
+            let {
+                cur_ProjectNumber,
+                singleProjectArr
+            } = _singleManager;
+
+            if(singleProjectArr[cur_ProjectNumber]
+                .restartInfo.tempRanNumArr.length > 1){
+                return;
+            }
+            else{
+                singleProjectArr[cur_ProjectNumber]
+                    .restartInfo.tempRanNumArr.push(leftNum);
+                singleProjectArr[cur_ProjectNumber]
+                    .restartInfo.tempRanNumArr.push(rightNum);
+                setSingleManager(_singleManager);
+            }
+        }
         setTimeout(()=>{
             setActiveNextBtn(true);
             setStateNotice(`Processing completed`)
@@ -217,13 +285,14 @@ function DrawIChingPannel(props : IDrawPannelProps) {
         }, 2000)
     }
     const singleNormalPrev = () => {
-        if(isClickedMake) return;
+        //if(isClickedMake) return;
         let _temp : ICreateControlManager = JSON.parse(JSON.stringify(createManager));
-
+        
         _temp.projectName = ``;
         _temp.cardCount = null;
         _temp.oracleType = null;
         _temp.creatingStep = 1;
+        _temp.tempRanNumArr = [];
 
         setCreateManager(_temp);
     }
@@ -254,7 +323,10 @@ function DrawIChingPannel(props : IDrawPannelProps) {
             NS_T_PreviewCard : null, // if normal, tarot, preview three cards
             NS_T_UseAutoDeck : 0,
             NS_T_PreviewCardNumArr: null,
-            cardInfoArr: []
+            cardInfoArr: [],
+            isRestarting: false,
+            restartInfo : null,
+
         }
 
         tempProject.projectId = _singleManager.singleProjectArr.length;
@@ -299,7 +371,7 @@ function DrawIChingPannel(props : IDrawPannelProps) {
         
     }
     const extra_singleNoramlPrev = () => {
-        if(isClickedMake) return;
+        //if(isClickedMake) return;
         setIsFirstOver(false);
         setSelectOracleType(null)
     }
@@ -340,8 +412,84 @@ function DrawIChingPannel(props : IDrawPannelProps) {
         setIsOpenExtraMake(false);
     }
 
-    const {makeBtnVar, maskVar} = DrawIChingCommon
+    // restart
+    const restart_singleNoramlPrev = () => {
+        //if(isClickedMake) return;
+        let _singleManager : ISingleControlManagerAtom = JSON.parse(JSON.stringify(singleManager));
+        let {
+            cur_ProjectNumber,
+            singleProjectArr
+        } = _singleManager;
+        let _tempInfo = {...defaultRestartInfo};
+        
+        let _infoRef = singleProjectArr[cur_ProjectNumber].restartInfo
+        _infoRef.creatingStep = 1;
+        _infoRef.projectName = '';
+        _infoRef.oracleType = null;
+        _infoRef.cardCount = null;
+        _infoRef.NS_T_PreviewCard = null;
+        _infoRef.NS_T_UseAutoDeck = 0;
+        _infoRef.tempRanNumArr = [];
+        setSingleManager(_singleManager);
+        //setIsFirstOver(false);
+        //setSelectOracleType(null)
+    }
+    const restart_singleNextHandler = () => {
+        let _singleManager : ISingleControlManagerAtom = JSON.parse(JSON.stringify(singleManager));
+        let {
+            singleProjectArr,
+            cur_ProjectNumber,
+        } = _singleManager;
+        let {restartInfo} = singleProjectArr[cur_ProjectNumber];
+        
+        let tempObj : IDragCardInfo = {
+            oracleType : 0,
+            imgNumber : 0,
+            zIdx : 0,
+            isInSpread : false,
+            isDraged: false,
+            isFlip : false,
+            isRotate : false,
+            newX : 0,
+            newY : 0,
+        }
+        let tempObjArr : IDragCardInfo[] = [];
 
+        let _pastItem = singleProjectArr[cur_ProjectNumber];
+        _pastItem.projectName = restartInfo.projectName;
+        _pastItem.projectType = restartInfo.isSandbox;
+        _pastItem.oracleType = restartInfo.oracleType;
+        _pastItem.totalCardCount = restartInfo.cardCount;
+        _pastItem.initialCardCount = restartInfo.cardCount;
+
+        if(
+            oracleType === 0 
+            && restartInfo.NS_T_UseAutoDeck !== 0
+        ){
+            _pastItem.rem_CardCount = 0;
+        } else {
+            _pastItem.rem_CardCount = restartInfo.cardCount;
+        }
+
+
+        for(let i = 0; i < 2; i++){
+            let _tempObj = {...tempObj};
+            _tempObj.oracleType = 2;
+            _tempObj.zIdx = 2 - i;
+            if(i === 0){
+                _tempObj.imgNumber = imgNumInfo.leftNum;
+            } else {
+                _tempObj.imgNumber = imgNumInfo.rightNum;
+            }
+            tempObjArr[i] = _tempObj;
+        }
+        _pastItem.cardInfoArr = tempObjArr;
+        _pastItem.isRestarting = false;
+        setSingleManager(_singleManager);
+    }
+
+    const {makeBtnVar, maskVar} = DrawIChingCommon
+    //console.log(imgNumInfo);
   return (
     <DrawIChingCommon.Container>
         <DrawIChingCommon.InContainer>
@@ -461,16 +609,18 @@ function DrawIChingPannel(props : IDrawPannelProps) {
             <DrawIChingCommon.PrevBtn
                 variants={makeBtnVar}
                 initial={makeBtnVar.initial}
-                animate={
-                    isClickedMake === false
-                    ? makeBtnVar.active
-                    : ""
-                }
-                whileHover={
-                    isClickedMake === false
-                    ? makeBtnVar.hover
-                    : ""
-                }
+                // animate={
+                //     isClickedMake === false
+                //     ? makeBtnVar.active
+                //     : ""
+                // }
+                // whileHover={
+                //     isClickedMake === false
+                //     ? makeBtnVar.hover
+                //     : ""
+                // }
+                animate={makeBtnVar.active}
+                whileHover={makeBtnVar.hover}
                 onClick={onPrevBtnHandler}
             >
                 PREV

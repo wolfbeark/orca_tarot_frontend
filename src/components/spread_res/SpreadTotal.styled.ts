@@ -140,6 +140,40 @@ export namespace SpreadTotal_Common{
         position: absolute;
         right: 5%;
     `
+    export const QuestionOptionBox = styled(VerCenterDiv)`
+        width: 100%;
+        height: 100%;
+        border-radius: inherit;
+        background-color: ${(props) => props.theme.defaultBaseOpaqueColor};
+        position: absolute;
+    `
+    export const InOptionBox = styled(VerCenterDiv)`
+        width: 40%;
+        height: 60%;
+        background-color: ${(props) => props.theme.defaultBaseColor};
+        border-radius: inherit;
+    `
+    export const OptionDesBox = styled(HorCenterDiv)`
+        width: 100%;
+        height: 25%;
+        //background-color: gray;
+        font-size: 150%;
+        color: ${(props) => props.theme.spreadDefaultTextColor};
+        margin-bottom: 5%;
+    `
+    export const OptionBtnBox = styled(HorCenterDiv)`
+        width: 100%;
+        height: 25%;
+        //background-color: navy;
+        padding: 1%;
+        justify-content: space-evenly;
+    `
+    export const OptionBtn = styled(HorCenterDiv)`
+        width: 30%;
+        height: 100%;
+        border-radius: inherit;
+        cursor: pointer;
+    `
     export const tabItemVar = {
         active: {
             backgroundColor: 'rgba(23, 65, 234, 1)'
@@ -209,10 +243,16 @@ export namespace ST_SingleList{
     export const Container = styled(HorCenterDiv)`
         width: 100%;
         height: 100%;
+        border-radius: inherit;
+        padding: 0.5%;
+    `
+    export const InContainer = styled(HorCenterDiv)`
+        width: 100%;
+        height: 100%;
         background-color: ${(props) => props.theme.defaultBaseOpaqueColor};
         border-radius: inherit;
         justify-content: space-between;
-        padding: 0.5%;
+        position: relative;
         & > div{
             border-radius: inherit;
         }
@@ -243,7 +283,10 @@ export namespace ST_SingleList{
                 //background-color: aquamarine;
             }
             &:nth-child(2){
-                width: 70%;
+                width: 15%;
+            }
+            &:nth-child(3){
+                width: 55%;
                 //background-color: cadetblue;
             }
             &:last-child{
@@ -283,7 +326,7 @@ export namespace ST_SingleList{
         margin-bottom: 1%;
         //font-family: ${(props) => props.theme.korFont};
         border : ${(props) => props.theme.spreadBtnDefaultborder};
-        font-weight: 600;
+        font-weight: 500;
         letter-spacing: 0.05em;
         cursor: pointer;
         & > div {
@@ -291,6 +334,9 @@ export namespace ST_SingleList{
             justify-content: center;
             align-items: center;
             height: 100%;
+            & div{
+                letter-spacing: 0.1em;
+            }
             //font-family: ${(props) => props.theme.korFont};
             &:first-child{
                 width: 10%;
@@ -298,7 +344,10 @@ export namespace ST_SingleList{
                 //background-color: aquamarine;
             }
             &:nth-child(2){
-                width: 70%;
+                width: 15%;
+            }
+            &:nth-child(3){
+                width: 55%;
                 //background-color: cadetblue;
             }
             &:last-child{

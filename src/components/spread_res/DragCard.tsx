@@ -195,7 +195,7 @@ function DragCard(props : IDragCard) {
         alpha = -(waitingInfo.x - (e.pageX - e.offsetX));
         beta = -(waitingInfo.y - (e.pageY - e.offsetY));
         
-        if(!cardInfoArr[cardNumber].isDraged) return;
+        if(cardInfoArr[cardNumber].isDraged) return;
         let _singleManager : ISingleControlManagerAtom = JSON.parse(JSON.stringify(singleManager));
         let _singleProjectArr = _singleManager.singleProjectArr;
         let _cardInfoArr = _singleProjectArr[cur_ProjectNumber].cardInfoArr;
@@ -248,7 +248,7 @@ function DragCard(props : IDragCard) {
         let _cardInfoArr = _singleProjectArr[cur_ProjectNumber].cardInfoArr;
         let errX : number;
         let errY : number;
-
+ 
         if(privateRotate === false){
             alpha = -(waitingInfo.x - (e.pageX - e.offsetX));
             beta = -(waitingInfo.y - (e.pageY - e.offsetY))
@@ -453,6 +453,7 @@ function DragCard(props : IDragCard) {
             backgroundColor: 'rgba(240, 147, 43, 0.7)'
         }
     }
+    //console.log(singleProjectArr[cur_ProjectNumber].cardInfoArr[cardNumber].isDraged)
 
   return (
     <Draggable nodeRef={cardRef}>

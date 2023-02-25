@@ -416,7 +416,7 @@ function MakeExtraTarot({
         {ExtraTarotDeckInfoArr.map((a,i) => {
             return(
                 <MEP_SecondFlag.T_DeckSelectItem
-                    key={`extratestitem${i}`}
+                    key={`extraTDeckItem${i}${a.name}`}
                     imgsrc={`${process.env.PUBLIC_URL}${defaultRoute}${a.imgNum}.png`}
                     variants={test2Var}
                     whileHover={
@@ -433,18 +433,18 @@ function MakeExtraTarot({
                         onClickSelectDeck(e, i)
                     }}
                 >
-                <motion.div
-                    variants={cardVar}
-                    initial={false}
-                >
-                </motion.div>
-                <motion.div
-                    variants={testNameVar}
-                    initial={testNameVar.initial}
-                >
-                    {/* {a.name + selectInfoArr[i]} */}
-                    {a.name}
-                </motion.div>
+                    <motion.div
+                        variants={cardVar}
+                        initial={false}
+                    >
+                    </motion.div>
+                    <motion.div
+                        variants={testNameVar}
+                        initial={testNameVar.initial}
+                    >
+                        {/* {a.name + selectInfoArr[i]} */}
+                        {a.name}
+                    </motion.div>
                 </MEP_SecondFlag.T_DeckSelectItem>
             );
         })}
@@ -455,7 +455,7 @@ function MakeExtraTarot({
                 <MEP_SecondFlag.SelectedList>
                 {listArr.map((a, i) => {
                     return(
-                        <motion.li key={`extraTList${a.listType}${i}`}>
+                        <motion.li key={`extraTListItem${a.listType}${i}${a.listName}`}>
                             <Typing 
                                 text={a.listName}
                                 cursorThickness={0}

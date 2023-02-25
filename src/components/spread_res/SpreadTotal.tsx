@@ -97,7 +97,7 @@ function SpreadTotal({setTabNumber} : ISpreadTotal) {
             </SpreadTotal_Common.LinkToCreateBtn>
             </div>
         </SpreadTotal_Common.ProjectAllEmptyBox>
-        }
+        } 
         {(!totalManager.projectCount && createManager.isCreating) &&
         <SpreadTotal_Common.ProjectAllEmptyBox>
             <div>

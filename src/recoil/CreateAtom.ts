@@ -18,6 +18,7 @@ export interface ICreateControlManager {
     cardCount: number | null,
     NS_T_PreviewCard : boolean | null, // if normal, tarot, preview three cards
     NS_T_UseAutoDeck : number,
+    tempRanNumArr : number[],
 }
 export const createControlManager = atom<ICreateControlManager>({
     key: "createControlManager",
@@ -32,6 +33,7 @@ export const createControlManager = atom<ICreateControlManager>({
         cardCount : null, // s
         NS_T_PreviewCard : null, // s
         NS_T_UseAutoDeck : 0, // s
+        tempRanNumArr : []
     }
 })
 

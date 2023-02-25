@@ -3,7 +3,7 @@ import React, {useEffect, useState} from 'react'
 import styled from 'styled-components';
 import {AnimatePresence, motion} from 'framer-motion';
 import { HorCenterDiv, VerCenterDiv } from 'common_resources/CommonStyle'
-import { useRecoilState } from 'recoil'
+import { useRecoilState, useRecoilValue } from 'recoil'
 import { createControlManager, EOracleType, ICreateControlManager } from 'recoil/CreateAtom'
 import { Typing } from 'components/common_res/typing_res/Typing'
 import { totalManagerAtom } from 'recoil/TotalAtom';
@@ -14,6 +14,7 @@ import {
     OracleCountLimitArr 
 } from 'common_resources/CommonData';
 import {IoIosArrowDown} from 'react-icons/io';
+import { singleControlManagerAtom } from 'recoil/SingleAtom';
 
 
 const SecondContainer = styled(VerCenterDiv)`
@@ -95,7 +96,7 @@ const SettingAttrInput = styled(motion.input)`
     color: ${(props) => props.theme.textColors.swanWhite};
     display: flex;
     justify-content: center;
-    font-family: ${(props) => props.theme.korFont};
+    //font-family: ${(props) => props.theme.korFont};
     font-weight: 600;
     align-items: center;
     margin-left: 1%;
@@ -263,7 +264,7 @@ const optionalBtnVar = {
     }
   },
 }
-
+ 
 
 const dropItemVar = {
   initial: {
@@ -286,6 +287,7 @@ const dropItemVar = {
 function SecondQuestion() {
     const [createManager, setCreateManager] = useRecoilState(createControlManager);
     const [totalManager, setTotalManager] = useRecoilState(totalManagerAtom);
+    const singleManager = useRecoilValue(singleControlManagerAtom);
     const {
         projectType,
         isSandbox
@@ -406,7 +408,7 @@ function SecondQuestion() {
         }
         let _temp : ICreateControlManager = JSON.parse(JSON.stringify(createManager));
         if(projectNameValue.length === 0){
-            _temp.projectName = `Default - ${totalManager.projectCount}`
+            _temp.projectName = `Default - ${singleManager.singleProjectArr.length}`
         }else{
             _temp.projectName = projectNameValue;
         }
@@ -450,7 +452,7 @@ function SecondQuestion() {
                             whileHover={dropItemVar.hover}
                             value={projectNameValue}
                             onChange={onProjectNameChangeHandler}
-                            placeholder={`Default - ${totalManager.projectCount}`}
+                            placeholder={`Default - ${singleManager.singleProjectArr.length}`}
                             autoComplete="off" 
                         />
                     </BoxWrapper>

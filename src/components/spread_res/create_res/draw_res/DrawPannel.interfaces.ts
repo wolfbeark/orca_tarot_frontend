@@ -4,6 +4,7 @@ import React from "react";
 export enum EWhatDrawMode {
     "SINGLE",
     "SINGLE_EXTRA",
+    "SINGLE_RESTART",
     "MULTI",
     "MULTI_EXTRA"
 }

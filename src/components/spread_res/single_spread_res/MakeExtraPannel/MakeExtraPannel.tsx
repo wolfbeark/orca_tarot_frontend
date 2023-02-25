@@ -161,7 +161,6 @@ function MakeExtraPannel({setIsOpenExtraMake} : IMakeExtraProps) {
 
   const {optionalBtnVar} = MEPCommon
     return (
-      <AnimatePresence>
       <MEPCommon.Container
         initial={{opacity: 0}}
         animate={{opacity: 1}}
@@ -185,8 +184,10 @@ function MakeExtraPannel({setIsOpenExtraMake} : IMakeExtraProps) {
             <MEP_FirstFlag.SelectBox>
             {DeckInfoArr.map((a,i) => {
               return(
+                <AnimatePresence
+                  key={`extraSelectOracle${a.name}${i}`}
+                >
                 <MEP_FirstFlag.SelectBoxItem
-                  key={`extraSelect${a.name}${i}`}
                   imgsrc={`${process.env.PUBLIC_URL}${a.defaultImage}`}
                   variants={selectTypeVar}
                   animate={
@@ -207,6 +208,7 @@ function MakeExtraPannel({setIsOpenExtraMake} : IMakeExtraProps) {
                 >
                   <div></div>
                 </MEP_FirstFlag.SelectBoxItem>
+                </AnimatePresence>
               );
             })}
             </MEP_FirstFlag.SelectBox>
@@ -227,30 +229,31 @@ function MakeExtraPannel({setIsOpenExtraMake} : IMakeExtraProps) {
         </AnimatePresence>
         <AnimatePresence>
         {(isFirstOver && !isSecondOver && selectOracleType === 0) && // Extra Tarot
-        <MEP_SecondFlag.Container
-          initial={{opacity: 0}}
-          animate={{opacity: 1, zIndex: 1}}
-          //exit={{opacity: 0}}
-        >
-          <MakeExtraTarot 
-            setIsFirstOver={setIsFirstOver}
-            setSelectOracleType={setSelectOracleType}
-            setIsSecondOver={setIsSecondOver}
-            setExtraCardCount={setExtraCardCount}
-            setExtraTarotDeck={setExtraTarotDeck}
-          />
-          <MEPCommon.ExitBtnBox
-            variants={optionTypeVar}
-            animate={optionTypeVar.active}
-            whileHover={optionTypeVar.hover}
-            onClick={(e) => {
-              e.preventDefault();
-              setIsOpenExtraMake(false);
-            }}
+          <MEP_SecondFlag.Container
+            key={`extartarotcontainer`}
+            initial={{opacity: 0}}
+            animate={{opacity: 1, zIndex: 1}}
+            //exit={{opacity: 0}}
           >
-            EXIT
-          </MEPCommon.ExitBtnBox>
-        </MEP_SecondFlag.Container>
+            <MakeExtraTarot 
+              setIsFirstOver={setIsFirstOver}
+              setSelectOracleType={setSelectOracleType}
+              setIsSecondOver={setIsSecondOver}
+              setExtraCardCount={setExtraCardCount}
+              setExtraTarotDeck={setExtraTarotDeck}
+            />
+            <MEPCommon.ExitBtnBox
+              variants={optionTypeVar}
+              animate={optionTypeVar.active}
+              whileHover={optionTypeVar.hover}
+              onClick={(e) => {
+                e.preventDefault();
+                setIsOpenExtraMake(false);
+              }}
+            >
+              EXIT
+            </MEPCommon.ExitBtnBox>
+          </MEP_SecondFlag.Container>
         }
         {/* {(isSecondOver && selectOracleType === 0) &&
         <DrawPannel 
@@ -264,25 +267,26 @@ function MakeExtraPannel({setIsOpenExtraMake} : IMakeExtraProps) {
           setIsSecondOver={setIsSecondOver}
         />
         } */}
-        <AnimatePresence>
-        {
-        //(isSecondOver && (selectOracleType !== 0 && selectOracleType !== 2)) 
-        (isSecondOver && selectOracleType !== 2)
-        &&
-        <DrawPannel 
-          whatDrawMode={EWhatDrawMode.SINGLE_EXTRA}
-          oracleType={selectOracleType}
-          extraCardCount={extraCardCount}
-          extraTarotDeck={extraTarotDeck}
-          setExtraTarotDeck={setExtraTarotDeck}
-          setExtraCardCount={setExtraCardCount}
-          setIsOpenExtraMake={setIsOpenExtraMake}
-          setSelectOracleType={setSelectOracleType}
-          setIsFirstOver={setIsFirstOver}
-          setIsSecondOver={setIsSecondOver}
-          setLenorOrPokerCountValue={setLenorOrPokerCountValue}
-        />
-        }
+          <AnimatePresence>
+          {
+          //(isSecondOver && (selectOracleType !== 0 && selectOracleType !== 2)) 
+          (isSecondOver && selectOracleType !== 2)
+          &&
+          <DrawPannel 
+            key={`singleExtarDrawPanel`}
+            whatDrawMode={EWhatDrawMode.SINGLE_EXTRA}
+            oracleType={selectOracleType}
+            extraCardCount={extraCardCount}
+            extraTarotDeck={extraTarotDeck}
+            setExtraTarotDeck={setExtraTarotDeck}
+            setExtraCardCount={setExtraCardCount}
+            setIsOpenExtraMake={setIsOpenExtraMake}
+            setSelectOracleType={setSelectOracleType}
+            setIsFirstOver={setIsFirstOver}
+            setIsSecondOver={setIsSecondOver}
+            setLenorOrPokerCountValue={setLenorOrPokerCountValue}
+          />
+          }
         </AnimatePresence>
         </AnimatePresence>
         <AnimatePresence>
@@ -374,7 +378,6 @@ function MakeExtraPannel({setIsOpenExtraMake} : IMakeExtraProps) {
         }
         </AnimatePresence>
       </MEPCommon.Container>
-      </AnimatePresence>
     )
 }
 

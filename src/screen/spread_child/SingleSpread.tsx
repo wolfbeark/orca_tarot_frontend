@@ -1,7 +1,7 @@
 /*eslint-disable */
 
-import React from 'react'
-import { useNavigate, useOutletContext } from 'react-router-dom';
+import React, {useEffect} from 'react'
+import { Outlet, useLocation, useNavigate, useOutletContext } from 'react-router-dom';
 import styled from 'styled-components'
 import {HorCenterDiv, VerCenterDiv} from 'common_resources/CommonStyle'
 import { useRecoilState } from 'recoil'
@@ -12,6 +12,7 @@ import { ISpreadTotal } from 'components/spread_res/SpreadTotal';
 import SingleSpreadZone from 'components/spread_res/single_spread_res/SingleSpreadZone';
 import { createControlManager, ICreateControlManager } from 'recoil/CreateAtom';
 import { ITotalManagerAtom, totalManagerAtom } from 'recoil/TotalAtom';
+import RestartSingleSpread from 'components/spread_res/single_spread_res/RestartSingle/RestartSingleSpread';
 
 const SingleContainer = styled(HorCenterDiv)`
     width: 100%;
@@ -96,6 +97,10 @@ function SingleSpread() {
   const navigate = useNavigate();
   const [totalManager, setTotalManager] = useRecoilState<ITotalManagerAtom>(totalManagerAtom);
   const [singleManager, setSingleManager] = useRecoilState(singleControlManagerAtom);
+  const {
+    singleProjectArr,
+    cur_ProjectNumber
+  } = singleManager;
   const [createManager, setCreateManager] = useRecoilState<ICreateControlManager>(createControlManager)
   const spreadProps = useOutletContext<ISpreadTotal>();
   const linkToCreateHandler = (e : React.MouseEvent<HTMLDivElement>) => {
@@ -112,6 +117,13 @@ function SingleSpread() {
         e.preventDefault();
         navigate('/spread/create')
     }
+  
+  // useEffect(()=> {
+  //   if(singleManager.isExistProject){
+  //     let _id  = singleManager.singleProjectArr[singleManager.cur_ProjectNumber].projectId;
+  //     navigate(`/spread/single/${_id}`)
+  //   }
+  // }, [])
   return (
     <SingleContainer>
       <InSingleContainer>
@@ -200,13 +212,15 @@ function SingleSpread() {
       }
       </AnimatePresence>
       <AnimatePresence>
-      {singleManager.isExistProject &&
+      {(singleManager.isExistProject 
+      //singleProjectArr[cur_ProjectNumber].isRestarting === false
+      ) &&
       <SingleSpreadZone />
-      }
+    }
       </AnimatePresence>
       </InSingleContainer>
     </SingleContainer>
   )
 }
 
-export default React.memo(SingleSpread)
+export default SingleSpread

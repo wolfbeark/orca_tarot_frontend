@@ -19,7 +19,7 @@ import {
 
 import { ITotalManagerAtom, totalManagerAtom } from 'recoil/TotalAtom';
 import { createControlManager, ICreateControlManager } from 'recoil/CreateAtom';
-import { IDragCardInfo, ISingleControlManagerAtom, ISingleProject, singleControlManagerAtom } from 'recoil/SingleAtom';
+import { defaultRestartInfo, IDragCardInfo, ISingleControlManagerAtom, ISingleProject, ISingleRestartItem, singleControlManagerAtom } from 'recoil/SingleAtom';
 import { useNavigate } from 'react-router-dom';
 import { ExtraTarotDeckInfoArr } from 'components/spread_res/single_spread_res/MakeExtraPannel/MakeExtraPannel.styled';
 
@@ -99,10 +99,17 @@ function DrawPannel(props : IDrawPannelProps) {
     const navigate = useNavigate();
     const [totalManager, setTotalManager] = useRecoilState(totalManagerAtom);
     const [createManager, setCreateManager] = useRecoilState(createControlManager);
-    const [singleManager, setSingleManager] = useRecoilState(singleControlManagerAtom);
+    const [singleManager, setSingleManager] = useRecoilState<ISingleControlManagerAtom>(singleControlManagerAtom);
     const resetCreateManager = useResetRecoilState(createControlManager);
     
+    const {
+        cur_ProjectNumber,
+        singleProjectArr
+    } = singleManager;
     
+    const restartInfo : ISingleRestartItem | null = 
+        singleProjectArr.length === 0 ? null : singleProjectArr[cur_ProjectNumber].restartInfo;
+
     const [defaultImg, setDefaultImg] = useState<string>('');
     
     // 단순카드순서배열
@@ -129,7 +136,7 @@ function DrawPannel(props : IDrawPannelProps) {
 
     const btnNameArr = ["Auto", "Shuffle", "Modify", "Reset", "Next"];
 
-
+    
     
     useLayoutEffect(()=>{
         let img = new Image();
@@ -144,16 +151,22 @@ function DrawPannel(props : IDrawPannelProps) {
     }, []);
     useEffect(()=>{
         if(whatDrawMode === EWhatDrawMode.SINGLE){
-            //if(oracleType !== null){
             let _max = Data.OracleMaxLimitArr[oracleType];
             let _noticeRange = `
                 Allowable range : 1 - ${_max}
             `
-            let _ranNumArr = RandomArrGenerator(_max);
+            let _ranNumArr;
+            if(createManager.tempRanNumArr.length === 0){
+                let _tempCreateManager : ICreateControlManager = JSON.parse(JSON.stringify(createManager));
+                _ranNumArr = RandomArrGenerator(_max);
+                _tempCreateManager.tempRanNumArr = _ranNumArr;
+                setCreateManager(_tempCreateManager);
+            }
+            else{
+                _ranNumArr = createManager.tempRanNumArr;
+            }
             let _numberArr = new Array(_max)
                 .fill(0).map((a, i) => a += i);
-            //console.log(_ranNumArr);
-            //console.log(_numberArr);
 
 
             setRanNumArr(_ranNumArr);
@@ -163,8 +176,8 @@ function DrawPannel(props : IDrawPannelProps) {
             setClickArr(new Array(_max).fill(false));
             setSelectedNumArr(new Array(_max).fill(null));
             setSelectableLimitCount(createManager.cardCount);
+           
             
-            //}
         }
         else if(whatDrawMode === EWhatDrawMode.SINGLE_EXTRA){
             let _max;
@@ -198,8 +211,44 @@ function DrawPannel(props : IDrawPannelProps) {
             setSelectableLimitCount(extraCardCount);
             
         }
+        else if(whatDrawMode === EWhatDrawMode.SINGLE_RESTART){
+            let _max = Data.OracleMaxLimitArr[oracleType];
+            let _noticeRange = `
+                Allowable range : 1 - ${_max}
+            `
+            // let _ranNumArr = RandomArrGenerator(_max);
+            let _numberArr = new Array(_max)
+                .fill(0).map((a, i) => a += i);
+
+            let _ranNumArr;
+            if(singleProjectArr[cur_ProjectNumber]
+                .restartInfo.tempRanNumArr.length === 0){
+                let _singleManager : ISingleControlManagerAtom = JSON.parse(JSON.stringify(singleManager));
+                let {
+                    cur_ProjectNumber,
+                    singleProjectArr
+                } = _singleManager;
+                _ranNumArr = RandomArrGenerator(_max);
+                singleProjectArr[cur_ProjectNumber]
+                    .restartInfo.tempRanNumArr = _ranNumArr;
+                setSingleManager(_singleManager);
+            }
+            else{
+                _ranNumArr = singleProjectArr[cur_ProjectNumber]
+                    .restartInfo.tempRanNumArr;
+            }
+
+            setRanNumArr(_ranNumArr);
+            setNumberArr(_numberArr);
+            setNoticeModifyRange(_noticeRange);
+
+            setClickArr(new Array(_max).fill(false));
+            setSelectedNumArr(new Array(_max).fill(null));
+            
+            setSelectableLimitCount(restartInfo.cardCount);
+        }
     }, [whatDrawMode])
-  
+    //console.log(ranNumArr);
     const modifyBtnVar = {
         active : {
           opacity: 1,
@@ -289,6 +338,14 @@ function DrawPannel(props : IDrawPannelProps) {
                         tempObj = optionalBtnVar.inactive
                     }
                 }
+                else if(whatDrawMode === EWhatDrawMode.SINGLE_RESTART){
+                    if(selectCount === restartInfo.cardCount){
+                        tempObj = optionalBtnVar.active
+                    }
+                    else{
+                        tempObj = optionalBtnVar.inactive
+                    }
+                }
                 else if(whatDrawMode === EWhatDrawMode.SINGLE_EXTRA){
                     if(selectCount === extraCardCount){
                         tempObj = optionalBtnVar.active
@@ -318,9 +375,32 @@ function DrawPannel(props : IDrawPannelProps) {
             }
         }
         else if(type === 4){
-            if(selectCount === createManager.cardCount){
-                tempObj = optionalBtnVar.hover
+            let _max : number;
+            if(whatDrawMode === EWhatDrawMode.SINGLE){
+                _max = createManager.cardCount;
             }
+            else if(whatDrawMode === EWhatDrawMode.SINGLE_RESTART){
+                _max = restartInfo.cardCount;
+            }
+            else if(whatDrawMode === EWhatDrawMode.SINGLE_EXTRA){
+                _max = extraCardCount;
+            }
+            if(selectCount === _max){
+                tempObj = optionalBtnVar.hover;
+            }
+            // if(whatDrawMode === EWhatDrawMode.SINGLE){
+            //     if(selectCount === createManager.cardCount){
+            //         tempObj = optionalBtnVar.hover
+            //     }
+            // }
+            // else if(whatDrawMode === EWhatDrawMode.SINGLE_EXTRA){
+
+            // }
+            // else if(whatDrawMode === EWhatDrawMode.SINGLE_RESTART){
+            //     if(selectCount === restartInfo.cardCount){
+            //         tempObj = optionalBtnVar.hover
+            //     }
+            // }
         }
 
         return tempObj;
@@ -328,7 +408,9 @@ function DrawPannel(props : IDrawPannelProps) {
     // Common Function
     const onClickCardHandler = (e : React.MouseEvent<HTMLDivElement>, num : number) => {
         e.preventDefault();
-        if(whatDrawMode === EWhatDrawMode.SINGLE){
+        if(whatDrawMode === EWhatDrawMode.SINGLE
+        || whatDrawMode === EWhatDrawMode.SINGLE_RESTART    
+        ){
             singleNormalClickHandler(num);
         }
         else if(whatDrawMode === EWhatDrawMode.SINGLE_EXTRA){
@@ -344,6 +426,9 @@ function DrawPannel(props : IDrawPannelProps) {
         }
         else if(whatDrawMode === EWhatDrawMode.SINGLE_EXTRA){
             extra_singleNormalPrevHandler();
+        }
+        else if(whatDrawMode === EWhatDrawMode.SINGLE_RESTART){
+            restart_singleNormalPrevHandler();
         }
 
     }
@@ -384,6 +469,11 @@ function DrawPannel(props : IDrawPannelProps) {
     const singleNormalShuffle = () => {
         let _max = Data.OracleMaxLimitArr[oracleType];
         let _ranNumArr = RandomArrGenerator(_max);
+        
+        let _tempCreateManager : ICreateControlManager = JSON.parse(JSON.stringify(createManager));
+        _tempCreateManager.tempRanNumArr = _ranNumArr;
+        setCreateManager(_tempCreateManager);
+        
         setIsLoading(true);
         setTimeout(()=>{
             setRanNumArr(_ranNumArr);
@@ -413,6 +503,7 @@ function DrawPannel(props : IDrawPannelProps) {
                 setModifyOpen(false);
                 setModifyErr('');
                 setCreateManager(_temp);
+                setModifyValue('');
             }, 3000)
         }
     }
@@ -436,6 +527,17 @@ function DrawPannel(props : IDrawPannelProps) {
                 newY: 0
             }
             let tempObjArr : IDragCardInfo[] = [];
+            let _tempRestartInfo : ISingleRestartItem = {
+                creatingStep: 0,
+                projectId: 0,
+                projectName: '',
+                isSandbox: false,
+                oracleType: 0,
+                cardCount: 0,
+                NS_T_PreviewCard: false,
+                NS_T_UseAutoDeck: 0,
+                tempRanNumArr: []
+            }
             let tempProject : ISingleProject = {
                 projectId: 0,
                 projectName: ``,
@@ -447,7 +549,9 @@ function DrawPannel(props : IDrawPannelProps) {
                 NS_T_PreviewCard : null, // if normal, tarot, preview three cards
                 NS_T_UseAutoDeck : 0,
                 NS_T_PreviewCardNumArr : null,
-                cardInfoArr: []
+                cardInfoArr: [],
+                isRestarting: false,
+                restartInfo : {..._tempRestartInfo},
             }
             
             for(let i = 0; i < _numArr.length; i++){
@@ -530,8 +634,15 @@ function DrawPannel(props : IDrawPannelProps) {
         let _count = selectCount;
         let _tempArr = [...clickArr];
         let _selectedArr = [...selectedNumArr];
+        let _max : number;
+        if(whatDrawMode === EWhatDrawMode.SINGLE){
+            _max = createManager.cardCount;
+        } else if(whatDrawMode === EWhatDrawMode.SINGLE_RESTART){
+            _max = restartInfo.cardCount;
+        }
+
         if(_clickFlag === false){
-            if(selectCount === createManager.cardCount) return;
+            if(selectCount === _max) return;
             _count++;
             _tempArr[num] = !_clickFlag;
             for(let i = 0; i < _selectedArr.length; i++){
@@ -568,6 +679,7 @@ function DrawPannel(props : IDrawPannelProps) {
         }
         _temp.oracleType = null;
         _temp.creatingStep = 1;
+        _temp.tempRanNumArr = [];
         setCreateManager(_temp);
     }
 
@@ -754,6 +866,206 @@ function DrawPannel(props : IDrawPannelProps) {
             setIsSecondOver(false);
         }
     }
+    // single restart
+    const restart_singleNormalAuto = () => {
+        let _max = restartInfo.cardCount;
+        let _clickArr = [...clickArr];
+        let _selectedArr = [...selectedNumArr];
+        for(let i = 0; i < _max; i++){
+            _clickArr[i] = true;
+            _selectedArr[i] = i;
+        }
+        setClickArr(_clickArr);
+        setSelectedNumArr(_selectedArr);
+        setSelectCount(_max);
+    }
+    const restart_singleNormalShuffle = () => {
+        let _max = Data.OracleMaxLimitArr[oracleType];
+        let _ranNumArr = RandomArrGenerator(_max);
+
+        let _singleManager : ISingleControlManagerAtom = JSON.parse(JSON.stringify(singleManager));
+        let {
+            cur_ProjectNumber,
+            singleProjectArr
+        } = _singleManager;
+                //_ranNumArr = RandomArrGenerator(_max);
+        singleProjectArr[cur_ProjectNumber]
+            .restartInfo.tempRanNumArr = _ranNumArr;
+        setSingleManager(_singleManager);
+
+        setIsLoading(true);
+        setTimeout(()=>{
+            setRanNumArr(_ranNumArr);
+            setIsLoading(false);
+        }, 3000)
+    }
+
+    const restart_singleNormalModifyCount = (e : React.MouseEvent<HTMLDivElement>) => {
+        e.preventDefault();
+        let flag = validModifyCount();
+        if(oracleType === null) return;
+        if(!flag){
+            //Its acceptable range is this.
+            let _message = `Acceptable range of ${Data.DeckNameArr[oracleType]} is ${Data.OracleCountLimitArr[oracleType]}`
+            setModifyErr(_message);
+
+        }
+        else{
+            let _tempManager : ISingleControlManagerAtom = JSON.parse(JSON.stringify(singleManager));
+            let {
+                cur_ProjectNumber,
+                singleProjectArr
+            } = _tempManager
+            let {
+                restartInfo
+            } = singleProjectArr[cur_ProjectNumber]
+            restartInfo.cardCount = Number(modifyValue);
+            
+            if(oracleType === 0 && restartInfo.NS_T_UseAutoDeck !== 0){
+                restartInfo.NS_T_UseAutoDeck = 0;
+            }
+            setIsLoading(true);
+            setSelectableLimitCount(restartInfo.cardCount);
+            setTimeout(()=>{
+                setModifyValue('');
+                setIsLoading(false);
+                setModifyOpen(false);
+                setModifyErr('');
+                setSingleManager(_tempManager);
+            }, 3000)
+        }
+    }
+    const restart_singleNormalNext = () => {
+
+        if(restartInfo.cardCount === null) return;
+        else if(restartInfo.cardCount !== null){
+            if(restartInfo.cardCount !== selectCount) return;
+            let _numArr = new Array(restartInfo.cardCount);
+            let _total : ITotalManagerAtom = JSON.parse(JSON.stringify(totalManager));
+            let _createManager : ICreateControlManager = JSON.parse(JSON.stringify(createManager));
+            let _singleManager : ISingleControlManagerAtom = JSON.parse(JSON.stringify(singleManager));
+            let {
+                cur_ProjectNumber,
+                singleProjectArr
+            } = _singleManager;
+            let tempObj : IDragCardInfo = {
+                oracleType: 0,
+                imgNumber: 0,
+                zIdx: 0,
+                isInSpread: false,
+                isDraged: false,
+                isFlip: false,
+                isRotate: false,
+                newX: 0,
+                newY: 0
+            }
+            let tempObjArr : IDragCardInfo[] = [];
+            let _tempRestartInfo : ISingleRestartItem = {
+                creatingStep: 0,
+                projectId: 0,
+                projectName: '',
+                isSandbox: false,
+                oracleType: 0,
+                cardCount: 0,
+                NS_T_PreviewCard: false,
+                NS_T_UseAutoDeck: 0,
+                tempRanNumArr: []
+            }
+            let tempProject : ISingleProject = {
+                projectId: 0,
+                projectName: ``,
+                projectType: false,
+                oracleType : null,
+                totalCardCount: 0,
+                initialCardCount : 0,
+                rem_CardCount: 0,
+                NS_T_PreviewCard : null, // if normal, tarot, preview three cards
+                NS_T_UseAutoDeck : 0,
+                NS_T_PreviewCardNumArr : null,
+                cardInfoArr: [],
+                isRestarting: false,
+                restartInfo : {..._tempRestartInfo},
+            }
+            
+            for(let i = 0; i < _numArr.length; i++){
+                let _tempNum = selectedNumArr[i];
+                if(_tempNum !== null){
+                    _numArr[i] = ranNumArr[_tempNum];
+                }
+            }
+            // new Code
+            let _pastItem = singleProjectArr[cur_ProjectNumber];
+            _pastItem.projectName = restartInfo.projectName;
+            _pastItem.projectType = restartInfo.isSandbox;
+            _pastItem.oracleType = restartInfo.oracleType;
+            _pastItem.totalCardCount = restartInfo.cardCount;
+            _pastItem.initialCardCount = restartInfo.cardCount;
+            if(restartInfo.oracleType === 0){
+                _pastItem.NS_T_PreviewCard = restartInfo.NS_T_PreviewCard;
+                _pastItem.NS_T_UseAutoDeck = restartInfo.NS_T_UseAutoDeck;
+                let _previewNumArr : number[];
+                _previewNumArr = RandomArrGenerator(78)
+                    .filter((a, i) => i < 3);
+                _pastItem.NS_T_PreviewCardNumArr = _previewNumArr;
+            }
+
+            if(
+                oracleType === 0 
+                && restartInfo.NS_T_UseAutoDeck !== 0
+            ){
+                _pastItem.rem_CardCount = 0;
+            } else {
+                _pastItem.rem_CardCount = restartInfo.cardCount;
+            }
+
+
+            for(let i = 0; i < restartInfo.cardCount; i++){
+                let _tempObj = {...tempObj};
+                _tempObj.oracleType = restartInfo.oracleType;
+                _tempObj.zIdx = restartInfo.cardCount - i;
+                _tempObj.imgNumber = _numArr[i];
+                if(restartInfo.NS_T_UseAutoDeck !== 0
+                && restartInfo.oracleType === 0    
+                ){
+                    _tempObj.isInSpread = true;
+                    _tempObj.zIdx = 0;
+                    if(restartInfo.NS_T_UseAutoDeck === 3
+                        && i === 1
+                    ){
+                        _tempObj.isRotate = true;
+                    }
+                }
+                tempObjArr[i] = _tempObj;
+            }
+            _pastItem.cardInfoArr = tempObjArr;
+
+
+            //_pastItem.restartInfo = null;
+            _pastItem.isRestarting = false;
+
+            setSingleManager(_singleManager);
+        }
+    }
+    const restart_singleNormalPrevHandler = () => {
+        let _singleManager : ISingleControlManagerAtom = JSON.parse(JSON.stringify(singleManager));
+        let {
+            cur_ProjectNumber,
+            singleProjectArr
+        } = _singleManager;
+        let _tempInfo = {...defaultRestartInfo};
+        
+        let _infoRef = singleProjectArr[cur_ProjectNumber].restartInfo
+        _infoRef.creatingStep = 1;
+        _infoRef.projectName = '';
+        _infoRef.oracleType = null;
+        _infoRef.cardCount = null;
+        _infoRef.NS_T_PreviewCard = null;
+        _infoRef.NS_T_UseAutoDeck = 0;
+        _infoRef.tempRanNumArr = [];
+        setSingleManager(_singleManager);
+        
+    }
+    
 
     
     const onAutoClickHandler = () => {
@@ -763,6 +1075,9 @@ function DrawPannel(props : IDrawPannelProps) {
         else if(whatDrawMode === EWhatDrawMode.SINGLE_EXTRA){
             extra_singleNormalAuto();
         }
+        else if(whatDrawMode === EWhatDrawMode.SINGLE_RESTART){
+            restart_singleNormalAuto();
+        }
     }
     const onShuffleClickHandler = () => {
         if(whatDrawMode === EWhatDrawMode.SINGLE){
@@ -770,6 +1085,9 @@ function DrawPannel(props : IDrawPannelProps) {
         }
         else if(whatDrawMode === EWhatDrawMode.SINGLE_EXTRA){
             extra_singleNormalShuffle();
+        }
+        else if(whatDrawMode === EWhatDrawMode.SINGLE_RESTART){
+            restart_singleNormalShuffle();
         }
 
     }
@@ -780,6 +1098,9 @@ function DrawPannel(props : IDrawPannelProps) {
         else if(whatDrawMode === EWhatDrawMode.SINGLE_EXTRA){
             extra_singleNormalModifyCount(e)
         }
+        else if(whatDrawMode === EWhatDrawMode.SINGLE_RESTART){
+            restart_singleNormalModifyCount(e)
+        }
 
     }
     const onNextClickHandler = () => {
@@ -788,6 +1109,9 @@ function DrawPannel(props : IDrawPannelProps) {
         }
         else if(whatDrawMode === EWhatDrawMode.SINGLE_EXTRA){
             extra_singleNormalNext();
+        }
+        else if(whatDrawMode === EWhatDrawMode.SINGLE_RESTART){
+            restart_singleNormalNext();
         }
 
     }
@@ -825,7 +1149,11 @@ function DrawPannel(props : IDrawPannelProps) {
     return(
       <DrawCommon.Container>
         <DrawCommon.InContainer>
-          <DrawCommon.DesStepBox>
+        <AnimatePresence>
+          <DrawCommon.DesStepBox
+            initial={{opacity : 0}}
+            animate={{opacity : 1}}
+          >
             <Typing
                 text={'Choose the cards you want.'}
                 letterSpacing={0.1}
@@ -833,6 +1161,7 @@ function DrawPannel(props : IDrawPannelProps) {
                 typeSpeed={3}
             />
           </DrawCommon.DesStepBox>
+        </AnimatePresence>
           <DrawCommon.DrawContainer>
                 <DrawCommon.DrawZone>
                     {numberArr.map((a,i) => {
@@ -1016,6 +1345,7 @@ function DrawPannel(props : IDrawPannelProps) {
                                                 onClick={() => {
                                                     setModifyOpen(false)
                                                     setModifyErr('');
+                                                    setModifyValue('');
                                                 }}
                                             >
                                                 Back

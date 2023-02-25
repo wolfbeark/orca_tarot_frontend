@@ -147,7 +147,7 @@ function FirstQuestion() {
               animate={isMulti === true ? questionBtnVar.active : ""}
               whileHover={questionBtnVar.hover}
               onClick={(e)=>{
-                settingHandler(e, true, true);
+                //settingHandler(e, true, true);
               }}
             >
               Multi
@@ -179,7 +179,7 @@ function FirstQuestion() {
               whileHover={questionBtnVar.hover}
               animate={isSandbox === true ? questionBtnVar.active : ""}
               onClick={(e)=>{
-                settingHandler(e, false, true);
+                //settingHandler(e, false, true);
               }}
             >
               Sandbox

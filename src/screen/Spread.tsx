@@ -13,6 +13,7 @@ import SpreadTotal from 'components/spread_res/SpreadTotal'
 import { ISingleControlManagerAtom, singleControlManagerAtom } from 'recoil/SingleAtom'
 
 import {FaAngleDoubleRight} from 'react-icons/fa';
+import { useNavigate } from 'react-router-dom'
 
 const SpreadContainer = styled(VerCenterDiv)<IContainer>`
   width: 100%;
@@ -294,8 +295,9 @@ interface IFoldBtn{
 
 function Spread() {
     const { wheight } = useRecoilValue(totalManagerAtom);
-    const [singleManager, setSingleManager] = useRecoilState(singleControlManagerAtom);
+    const navigate = useNavigate();
     const location = useLocation();
+    const [singleManager, setSingleManager] = useRecoilState(singleControlManagerAtom);
     const foldRef = useRef() as React.MutableRefObject<HTMLDivElement>;
     const [tabNumber, setTabNumber] = useState<number>(0);
     const [foldWidth, setFoldWidth] = useState<number>(0);
@@ -320,7 +322,12 @@ function Spread() {
             setTabNumber(0);
         }
         else if(singleMatch){
-            setTabNumber(1);
+            if(singleManager.isExistProject){
+                setTabNumber(1);
+            }
+            else{
+                
+            }
         }
         else if(multiMatch){
             setTabNumber(2);
@@ -351,6 +358,29 @@ function Spread() {
             backgroundColor: `rgba(20, 20, 20, 0.2)`,
         }
     }
+    const sortLink = (i : number) : string => {
+        let _temp : string;
+        if(i === 0){
+            _temp = linkArr[0];
+        }
+        else if(i === 1){
+            // if(!singleManager.isExistProject){
+            //     _temp = linkArr[1];
+            // }
+            // else{
+            //     _temp = `/spread/single/${singleManager.cur_ProjectNumber}`;
+            // }
+                _temp = linkArr[1];
+
+        }
+        else if(i === 2){
+            _temp = linkArr[2];
+        }
+        else if(i === 3){
+            _temp = linkArr[3];
+        }
+        return _temp;
+    }
 
     const allTabFoldHandler = (e : React.MouseEvent<HTMLDivElement>) => {
         e.preventDefault();
@@ -362,12 +392,16 @@ function Spread() {
         let _tempManager : ISingleControlManagerAtom = JSON.parse(JSON.stringify(singleManager));
         _tempManager.cur_ProjectNumber = num;
         setSingleManager(_tempManager);
+
+        //navigate(`/spread/single/${num}`)
     }
   return (
     <SpreadContainer
         wheight={wheight}
     >
-        <ContentBox>
+        <ContentBox
+            
+        >
             <LeftBgBox
                 imgsrc={`${process.env.PUBLIC_URL}/images/LDefaultBackGround.png`}
             >
@@ -385,7 +419,7 @@ function Spread() {
                         style={
                             isFoldTab === true
                             ? {zIndex: 0}
-                            : {zIndex: 3}
+                            : {zIndex: 2}
                         }
                     >
                     <AnimatePresence>
@@ -393,7 +427,10 @@ function Spread() {
                             isFoldTab === false &&
                             <TabBox
                                 exit={{
-                                    opacity: 0
+                                    opacity: 0,
+                                }}
+                                style={{
+                                    zIndex: 2
                                 }}
                             >
                             {
@@ -417,8 +454,9 @@ function Spread() {
                                                 e.preventDefault();
                                                 setTabNumber(i);
                                             }}
+                                            
                                         >
-                                            <Link to={linkArr[i]}>
+                                            <Link to={sortLink(i)}>
                                                 {a}
                                                 <AnimatePresence>
                                                 {
@@ -497,7 +535,11 @@ function Spread() {
                                                 }}
                                                 exit={tabVar.exit}
                                             >
+                                                {/* <Link to={`/spread/single/${i}`}>
+                                                
+                                                </Link> */}
                                                 {a.projectName}
+
                                                 {
                                                     i === singleManager.cur_ProjectNumber &&
                                                     <AnimatePresence>

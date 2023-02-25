@@ -5,13 +5,16 @@ import {motion, AnimatePresence} from 'framer-motion';
 
 import { HorCenterDiv, VerCenterDiv } from 'common_resources/CommonStyle';
 import { useRecoilState } from 'recoil';
-import { ISingleControlManagerAtom, singleControlManagerAtom } from 'recoil/SingleAtom';
+import { ISingleControlManagerAtom, ISingleRestartItem, singleControlManagerAtom } from 'recoil/SingleAtom';
 import DragCard from '../DragCard';
 import { ICustomDOMPosition, IPositionInfo, PositionValueObj } from 'common_resources/CommonInterfaces';
 import { SpreadControlBtnNameArr } from 'common_resources/CommonData';
 import MakeExtraPannel from './MakeExtraPannel/MakeExtraPannel';
 import html2canvas from 'html2canvas';
-
+import { SSO_RQuestion, SS_Common, SS_RestartFirst } from './SingleSpreadZone.styled';
+import RestartSingleSpread from './RestartSingle/RestartSingleSpread';
+//import { ISingleRestartItem, ISingleRestartManager, singleRestartManagerAtom } from 'recoil/RestartAtom';
+import {useLocation, useParams} from 'react-router-dom';
 interface IPreviewContainer {
     positioninfo? : IPositionInfo,
     imgsrc? : string
@@ -262,11 +265,17 @@ const TestExtraBox = styled(HorCenterDiv)`
 `
 function SingleSpreadZone() {
 
+    const location = useLocation();
+    const params = useParams();
     const [singleManager, setSingleManager] = useRecoilState(singleControlManagerAtom);
     const {
         cur_ProjectNumber,
         singleProjectArr
-    } = singleManager
+    } = singleManager;
+
+
+    //const [singleResManager, setSingleResManager] = useRecoilState<ISingleRestartManager>(singleRestartManagerAtom);
+
     const totalRef = useRef() as React.MutableRefObject<HTMLDivElement>;
     const carpetRef = useRef() as React.MutableRefObject<HTMLDivElement>;
     const waitingRef = useRef() as React.MutableRefObject<HTMLDivElement>;
@@ -282,6 +291,21 @@ function SingleSpreadZone() {
     
     // 2023.02.13 수술중
     const [isOpenExtraMake, setIsOpenExtraMake] = useState<boolean>(false);
+    const [isOpenRestart, setIsOpenRestart] = useState<boolean>(false);
+
+
+    const {optionBtnVar} = SS_Common;
+        //console.log(location)
+        //console.log(params);
+
+    useEffect(()=>{
+        if(isOpenRestart) setIsOpenRestart(false);
+        if(isOpenExtraMake) setIsOpenExtraMake(false);
+        return() => {
+          if(isOpenRestart) setIsOpenRestart(false);
+          if(isOpenExtraMake) setIsOpenExtraMake(false);
+        };
+    }, [singleManager.cur_ProjectNumber])
     useLayoutEffect(()=> {
       if(singleProjectArr[cur_ProjectNumber].NS_T_PreviewCard){
         let _tempArr : string[] = []
@@ -295,6 +319,7 @@ function SingleSpreadZone() {
       }
     }, [singleProjectArr])
     useEffect(() => {
+      //if(singleProjectArr[cur_ProjectNumber].isRestarting === false){
         let _waiting = waitingRef?.current.getBoundingClientRect();
         let _carpet = carpetRef?.current.getBoundingClientRect();
         let _tempObj : IPositionInfo = {
@@ -321,9 +346,16 @@ function SingleSpreadZone() {
             gapX : (_waiting.x - _carpet.x),
             gapY : (_waiting.y - _carpet.y),
         };
-        
         setPositionInfo(_tempObj)
-    }, [])
+      //}
+     // else{
+       // setIsOpenRestart(true);
+     // }
+
+    }, [singleManager.cur_ProjectNumber, 
+      singleManager.singleProjectArr[cur_ProjectNumber].isRestarting
+    ])
+    
 
     const onPreviewOpenControl = (e : React.MouseEvent<HTMLDivElement>) => {
       e.preventDefault();
@@ -337,7 +369,12 @@ function SingleSpreadZone() {
       let _cardInfoArr = _singleProjectArr[cur_ProjectNumber].cardInfoArr;
 
       if(type === 0){
-
+        //setIsOpenRestart(true);
+        onClickRestartOptionBtn(e, 0)
+        // let _tempOption : ISpreadOptionAtom = JSON.parse(JSON.stringify(spreadOption));
+        // _tempOption.isOpenedOption = true;
+        // _tempOption.openedOptionType = 0;
+        // setSpreadOption(_tempOption);
       }
       else if(type === 3){
         for(let i = 0; i < _cardInfoArr.length; i++){
@@ -419,174 +456,267 @@ function SingleSpreadZone() {
           }
           //"image-download.png"
         );
-      };
-      const onSaveAs = (uri : any, filename : any) => {
-        //console.log('onSaveAs');
-        let link = document.createElement("a");
-        document.body.appendChild(link);
-        link.href = uri;
-        link.download = filename;
-        //link.style.zIndex = "1000";
-        //link.style.position = "absolute";
-        //console.dir(link);
-        link.click();
-        document.body.removeChild(link);
-        //window.location.reload();
-      };
+    };
+    const onSaveAs = (uri : any, filename : any) => {
+      //console.log('onSaveAs');
+      let link = document.createElement("a");
+      document.body.appendChild(link);
+      link.href = uri;
+      link.download = filename;
+      //link.style.zIndex = "1000";
+      //link.style.position = "absolute";
+      //console.dir(link);
+      link.click();
+      document.body.removeChild(link);
+      //window.location.reload();
+    };
+    const onClickRestartOptionBtn = (e : React.MouseEvent<HTMLDivElement>, type : number) => {
+      e.preventDefault();
+      if(type === 0){
+        let _tempManager : ISingleControlManagerAtom = JSON.parse(JSON.stringify(singleManager));
+        
+        let _tempInfo : ISingleRestartItem = {
+            creatingStep: 0,
+            projectId: singleProjectArr[cur_ProjectNumber].projectId,
+            projectName: singleProjectArr[cur_ProjectNumber].projectName,
+            isSandbox: false,
+            oracleType: null,
+            cardCount: null,
+            NS_T_PreviewCard: null,
+            NS_T_UseAutoDeck: 0,
+            tempRanNumArr: []
 
-  return (
-    <SingleSpreadContainer>
-        <InSingleSpreadZone
-            ref={totalRef}
-            id="singleSpreadZone"
-        >
-          <SpreadCarpet
-            ref={carpetRef}
-          >
-            <AnimatePresence>
-            {
-              (singleProjectArr[cur_ProjectNumber].oracleType === 0 &&
-              singleProjectArr[cur_ProjectNumber].NS_T_PreviewCard  
-              ) &&
-              <PreviewBox
-                positioninfo={positionInfo}
-              >
-                <motion.div
-                  onClick={onPreviewOpenControl}
-                >
-                  Preview
-                  <AnimatePresence>
-                  {
-                    previewOpen &&
-                    <motion.div>
-                      <motion.div>
-                        {previewImgSrcArr.map((a, i) => {
-                          return(
-                            <AnimatePresence
-                              key={`previewCard${a}${i}`}
-                            >
-                                <PreviewCard
-                                  positioninfo={positionInfo}
-                                  imgsrc={`${process.env.PUBLIC_URL}${a}`}
-                                  
-                                  >
-                                  <motion.div
-                                  initial={{opacity: 0}}
-                                  animate={{opacity: [0, 1]}}
-                                  >
-                                  </motion.div>
-                                  <motion.div
-                                  initial={{opacity: 1}}
-                                  animate={{opacity: [1, 0]}}
-                                  >
+        }
+        _tempManager.singleProjectArr[cur_ProjectNumber]
+          .isRestarting = true;
+        _tempManager.singleProjectArr[cur_ProjectNumber]
+          .restartInfo = {..._tempInfo};
+        
+        
+        setSingleManager(_tempManager);
+        setIsOpenRestart(false);
+      }
+      else if(type === 1){
+        setIsOpenRestart(false);
+      }
+    }
 
-                                  </motion.div>
-                                </PreviewCard>
-                            </AnimatePresence>
-                          );
-                        })}
-                      </motion.div>
-                    </motion.div>
-                  }
-                  </AnimatePresence>
-                </motion.div>
-              </PreviewBox>
-            }
-            </AnimatePresence>
-            
-          </SpreadCarpet>
-          <SpreadControl>
-            <CardBox>
-              <motion.div>
-                <CardWaitingZone
-                    ref={waitingRef}
-                >
-                  {
-                  singleProjectArr[cur_ProjectNumber].cardInfoArr.map((a, i) => {
-
-                    return(
-                        <DragCard
-                            key={`dragCard
-                              ${i}${a.imgNumber}${a.oracleType}${singleProjectArr[cur_ProjectNumber].projectId}
-                            `} 
-                            positioninfo={positionInfo}
-                            cardNumber={i}
-                            refArr={refArr}
-                        />
-                    );
-                })
-            }
-                </CardWaitingZone>
-                <ExtraDeckZone>
-                  <AnimatePresence>
-                    {
-                      singleProjectArr[cur_ProjectNumber].rem_CardCount === 0 &&
-                      <ExtraBtnBox
-                        initial={{opacity: 0}}
-                        animate={{opacity: 1}}
-                        exit={{opacity: 0}} 
-                        imgsrc={`${process.env.PUBLIC_URL}/images/BackOfCards/BackOfCard0.png`}
-                        onClick={(e) => {
-                          e.preventDefault();
-                          if(singleProjectArr[cur_ProjectNumber].rem_CardCount !== 0) return;
-                          setIsOpenExtraMake(true);
-                        }}
-                      />
-                    }
-                  </AnimatePresence>
-                </ExtraDeckZone>
-              </motion.div>
-            </CardBox>
-            <CardCounterBox>
-                <CardTotalNotice>
-                    <div>Total</div>
-                    <div>
-                    {
-                        singleProjectArr[cur_ProjectNumber].totalCardCount
-                    }
-                    </div>
-                </CardTotalNotice>
-                <CardRemainNotice>
-                    <div>Remain</div>
-                    <div>
-                    {
-                        singleProjectArr[cur_ProjectNumber].rem_CardCount
-                    }
-                    </div>
-                </CardRemainNotice>
-            </CardCounterBox>
-            <SpreadControlBtnBox>
-              {
-                SpreadControlBtnNameArr.map((a, i) => {
-                  return(
-                    <ControlBtn
-                      key={`spreadControlBtn${a}${i}`}
-                      variants={optionalBtnVar}
-                      animate={optionalBtnVar.active}
-                      whileHover={optionalBtnVar.hover}
-                      onClick={(e)=>{
-                        spreadContorlBtnHandler(e, i)
-                      }}
-                    >
-                      <motion.div>
-                      {a}
-                      </motion.div>
-                    </ControlBtn>
-                  );
-                })
-              }
-            </SpreadControlBtnBox>
-          </SpreadControl>
-        </InSingleSpreadZone>
+      return (
+        <>
         <AnimatePresence>
-          {isOpenExtraMake &&
-          <MakeExtraPannel 
-            setIsOpenExtraMake={setIsOpenExtraMake}
-          />
-          }
+        {
+        (singleManager.isExistProject &&
+        singleManager.singleProjectArr[cur_ProjectNumber].isRestarting === true 
+        ) &&
+        <RestartSingleSpread
+            key={`${singleProjectArr[cur_ProjectNumber].projectName}
+              ${singleProjectArr[cur_ProjectNumber].projectId}
+            `}
+            projectId={singleProjectArr[cur_ProjectNumber].projectId}
+            cur_projectNumber={singleManager.cur_ProjectNumber}
+        />
+        }
         </AnimatePresence>
-      </SingleSpreadContainer>
-  )
+        <SingleSpreadContainer
+          //initial={{opacity:0}}
+          //animate={{opacity: 1, zIndex: 1}}
+          //exit={{opacity: 0, zIndex: 0}}
+          // style={
+          //   singleProjectArr[cur_ProjectNumber].isRestarting
+          //   ? {display: 'hidden'} 
+          //   : {display : 'visible'}
+          // }
+        >
+            <InSingleSpreadZone
+                ref={totalRef}
+                id="singleSpreadZone"
+            >
+              <SpreadCarpet
+                ref={carpetRef}
+              >
+                <AnimatePresence>
+                {
+                  (singleProjectArr[cur_ProjectNumber].oracleType === 0 &&
+                  singleProjectArr[cur_ProjectNumber].NS_T_PreviewCard  
+                  ) &&
+                  <PreviewBox
+                    positioninfo={positionInfo}
+                  >
+                    <motion.div
+                      onClick={onPreviewOpenControl}
+                    >
+                      Preview
+                      <AnimatePresence>
+                      {
+                        previewOpen &&
+                        <motion.div>
+                          <motion.div>
+                            {previewImgSrcArr.map((a, i) => {
+                              return(
+                                <AnimatePresence
+                                  key={`previewCard${a}${i}`}
+                                >
+                                    <PreviewCard
+                                      positioninfo={positionInfo}
+                                      imgsrc={`${process.env.PUBLIC_URL}${a}`}
+                                      
+                                      >
+                                      <motion.div
+                                      initial={{opacity: 0}}
+                                      animate={{opacity: [0, 1]}}
+                                      >
+                                      </motion.div>
+                                      <motion.div
+                                      initial={{opacity: 1}}
+                                      animate={{opacity: [1, 0]}}
+                                      >
+    
+                                      </motion.div>
+                                    </PreviewCard>
+                                </AnimatePresence>
+                              );
+                            })}
+                          </motion.div>
+                        </motion.div>
+                      }
+                      </AnimatePresence>
+                    </motion.div>
+                  </PreviewBox>
+                }
+                </AnimatePresence>
+                
+              </SpreadCarpet>
+              <SpreadControl>
+                <CardBox>
+                  <motion.div>
+                    <CardWaitingZone
+                        ref={waitingRef}
+                    >
+                      {
+                      singleProjectArr[cur_ProjectNumber].cardInfoArr.map((a, i) => {
+    
+                        return(
+                            <DragCard
+                                key={`dragCard
+                                  ${i}${a.imgNumber}${a.oracleType}${singleProjectArr[cur_ProjectNumber].projectId}
+                                `} 
+                                positioninfo={positionInfo}
+                                cardNumber={i}
+                                refArr={refArr}
+                            />
+                        );
+                    })
+                }
+                    </CardWaitingZone>
+                    <ExtraDeckZone>
+                      <AnimatePresence>
+                        {
+                          singleProjectArr[cur_ProjectNumber].rem_CardCount === 0 &&
+                          <ExtraBtnBox
+                            initial={{opacity: 0}}
+                            animate={{opacity: 1}}
+                            exit={{opacity: 0}} 
+                            imgsrc={`${process.env.PUBLIC_URL}/images/BackOfCards/BackOfCard0.png`}
+                            onClick={(e) => {
+                              e.preventDefault();
+                              if(singleProjectArr[cur_ProjectNumber].rem_CardCount !== 0) return;
+                              setIsOpenExtraMake(true);
+                            }}
+                          />
+                        }
+                      </AnimatePresence>
+                    </ExtraDeckZone>
+                  </motion.div>
+                </CardBox>
+                <CardCounterBox>
+                    <CardTotalNotice>
+                        <div>Total</div>
+                        <div>
+                        {
+                            singleProjectArr[cur_ProjectNumber].totalCardCount
+                        }
+                        </div>
+                    </CardTotalNotice>
+                    <CardRemainNotice>
+                        <div>Remain</div>
+                        <div>
+                        {
+                            singleProjectArr[cur_ProjectNumber].rem_CardCount
+                        }
+                        </div>
+                    </CardRemainNotice>
+                </CardCounterBox>
+                <SpreadControlBtnBox>
+                  {
+                    SpreadControlBtnNameArr.map((a, i) => {
+                      return(
+                        <ControlBtn
+                          key={`spreadControlBtn${a}${i}`}
+                          variants={optionalBtnVar}
+                          animate={optionalBtnVar.active}
+                          whileHover={optionalBtnVar.hover}
+                          onClick={(e)=>{
+                            spreadContorlBtnHandler(e, i)
+                          }}
+                        >
+                          <motion.div>
+                          {a}
+                          </motion.div>
+                        </ControlBtn>
+                      );
+                    })
+                  }
+                </SpreadControlBtnBox>
+              </SpreadControl>
+            </InSingleSpreadZone>
+            <AnimatePresence>
+              {isOpenExtraMake &&
+              <MakeExtraPannel 
+                setIsOpenExtraMake={setIsOpenExtraMake}
+              />
+              }
+            </AnimatePresence>
+            <AnimatePresence>
+            {/* {isOpenRestart === true &&
+            <SSO_RQuestion.Container>
+              <SSO_RQuestion.QuestionBox>
+                <SSO_RQuestion.InQuestionBox>
+                  <SSO_RQuestion.QuestionDesBox>Restart</SSO_RQuestion.QuestionDesBox>
+                  <SSO_RQuestion.QuestionBtnBox>
+                    <SSO_RQuestion.OptionBtn
+                      variants={optionBtnVar}
+                      initial={optionBtnVar.initial}
+                      animate={optionBtnVar.active}
+                      whileHover={optionBtnVar.hover}
+                      onClick={(e) => onClickRestartOptionBtn(e, 0)}
+                    >
+                      YES
+                    </SSO_RQuestion.OptionBtn>
+                    <SSO_RQuestion.OptionBtn
+                      variants={optionBtnVar}
+                      initial={optionBtnVar.initial}
+                      animate={optionBtnVar.active}
+                      whileHover={optionBtnVar.hover}
+                      onClick={(e) => onClickRestartOptionBtn(e, 1)}
+                    >
+                      NO
+                    </SSO_RQuestion.OptionBtn>
+                  </SSO_RQuestion.QuestionBtnBox>
+                </SSO_RQuestion.InQuestionBox>
+              </SSO_RQuestion.QuestionBox>
+            </SSO_RQuestion.Container>
+            } */}
+            </AnimatePresence>
+            {/* <AnimatePresence>
+            {singleProjectArr[cur_ProjectNumber].isRestarting === true &&
+            <RestartSingleSpread 
+              projectId={singleProjectArr[cur_ProjectNumber].projectId}
+            />
+            }
+            </AnimatePresence> */}
+        </SingleSpreadContainer>
+        </>
+      )
 }
 
 export default React.memo(SingleSpreadZone);

@@ -1,9 +1,14 @@
 /* eslint-disable */
-import React, { useState } from 'react'
-import { useRecoilState } from 'recoil';
+import React, { useEffect, useState } from 'react'
+import { useRecoilState, useResetRecoilState } from 'recoil';
+import {
+    ITotalManagerAtom,
+    totalManagerAtom
+} from 'recoil/TotalAtom'
 import { 
     ISingleControlManagerAtom, 
-    singleControlManagerAtom 
+    singleControlManagerAtom ,
+    ISingleRestartItem
 } from 'recoil/SingleAtom';
 
 import {
@@ -22,42 +27,117 @@ import { useNavigate } from 'react-router-dom';
 function TotalSingleList() {
 
     const navigate = useNavigate();
-    const [singleManager, setSinlgeManager] = useRecoilState<ISingleControlManagerAtom>(singleControlManagerAtom);
-    
+    const [totalManager, setTotalManager] = useRecoilState<ITotalManagerAtom>(totalManagerAtom)
+    const [singleManager, setSingleManager] = useRecoilState<ISingleControlManagerAtom>(singleControlManagerAtom);
+    const resetSingleManager = useResetRecoilState(singleControlManagerAtom);
     const {
-        singleProjectArr
+        singleProjectArr,
     } = singleManager;
+    const [projectArr, setProjectArr] = useState(singleProjectArr);
 
+    useEffect(()=>{
+        setProjectArr(singleManager.singleProjectArr);
+    }, [singleManager])
     const [selectedNumber, setSelectedNumber] = useState<number | null>(null);
-    
+    const [isClickedOption, setIsClickedOption] = useState<boolean>(false);
+    const [optionType, setOptionType] = useState<number | null>(null);
     const onSelectList = (e : React.MouseEvent<HTMLDivElement>, idx : number) => {
         e.preventDefault();
         if(selectedNumber === idx) return;
         setSelectedNumber(idx);
     }
-
     const onClickOptionHandler = (e : React.MouseEvent<HTMLDivElement>, type : number) => {
         e.preventDefault();
         let _tempManager : ISingleControlManagerAtom = JSON.parse(JSON.stringify(singleManager));
         if(type === 0){
             _tempManager.cur_ProjectNumber = selectedNumber;
-            setSinlgeManager(_tempManager);
+            setSingleManager(_tempManager);
             navigate('/spread/single');
         }
         else if(type === 1){
-
+            if(singleProjectArr[selectedNumber].isRestarting) return;
+            setIsClickedOption(true);
+            setOptionType(0);
         }
         else if(type === 2){
+            setIsClickedOption(true);
+            setOptionType(1);
+        }
+    }
+    const onClickRestartHanlder = (e : React.MouseEvent<HTMLDivElement>, type : boolean) => {
+        e.preventDefault();
+        if(type){
+            if(singleProjectArr[selectedNumber].isRestarting === true) return;
+            let _tempManager : ISingleControlManagerAtom = JSON.parse(JSON.stringify(singleManager));
+            
+            let _tempInfo : ISingleRestartItem = {
+                creatingStep: 0,
+                projectId: singleProjectArr[selectedNumber].projectId,
+                projectName: singleProjectArr[selectedNumber].projectName,
+                isSandbox: false,
+                oracleType: null,
+                cardCount: null,
+                NS_T_PreviewCard: null,
+                NS_T_UseAutoDeck: 0,
+                tempRanNumArr: []
+            }
+            _tempManager.singleProjectArr[selectedNumber]
+            .isRestarting = true;
+            _tempManager.singleProjectArr[selectedNumber]
+            .restartInfo = {..._tempInfo};
+            _tempManager.cur_ProjectNumber = selectedNumber;
+            
+            
+            setSingleManager(_tempManager);
+            navigate(`/spread/single`);
+        }
+        else{
+            setIsClickedOption(false);
+            setOptionType(null)
+        }
+    }
+    const onClickDeleteHanlder = (e : React.MouseEvent<HTMLDivElement>, type : boolean) => {
+        e.preventDefault();
+        if(type){
+            let _totalManager : ITotalManagerAtom = JSON.parse(JSON.stringify(totalManager));
+            let _tempManager : ISingleControlManagerAtom = JSON.parse(JSON.stringify(singleManager));
+            let {
+                singleProjectArr,
+                cur_ProjectNumber
+            } = _tempManager;
 
+            if(singleProjectArr.length > 1){
+                let _tempArr = singleProjectArr
+                    .filter((a, i) => i !== selectedNumber);
+                _tempManager.singleProjectArr = _tempArr;
+                _tempManager.cur_ProjectNumber = 0;
+                setSingleManager(_tempManager);
+            }
+            else{
+                resetSingleManager();
+            }
+            _totalManager.singleNormalCount--;
+            _totalManager.projectCount--;
+            setTotalManager(_totalManager);
+            setSelectedNumber(null);
+            setIsClickedOption(false);
+            setOptionType(null)
+
+        }
+        else{
+            setIsClickedOption(false);
+            setOptionType(null)
         }
     }
 
     const { optionalBtnVar, listItemVar } = SpreadTotal_Common;
     return (
         <ST_SingleList.Container>
+            <ST_SingleList.InContainer>
             <ST_SingleList.ProjectListBox>
                 <ST_SingleList.ListItemTypeTable>
                     <div>Num</div>
+                    <div>State</div>
                     <div>Project Name</div>
                     <div>Project Type</div>
                 </ST_SingleList.ListItemTypeTable>
@@ -87,6 +167,12 @@ function TotalSingleList() {
                             }
                             </AnimatePresence>
                             {i + 1}
+                            </div>
+                            <div>
+                            {singleProjectArr[i].isRestarting === false
+                            ? "ACTIVE"
+                            : "RESTARTING"
+                            }
                             </div>
                             <div>
                             {a.projectName}
@@ -233,8 +319,17 @@ function TotalSingleList() {
                 <ST_SingleList.InfoOptionBtn
                     variants={optionalBtnVar}
                     initial={optionalBtnVar.initial}
-                    animate={optionalBtnVar.active}
-                    whileHover={optionalBtnVar.hover}
+                    animate={
+                        singleProjectArr[selectedNumber].isRestarting === false
+                        ? optionalBtnVar.active
+                        : optionalBtnVar.inactive
+                    }
+                    whileHover={
+                        singleProjectArr[selectedNumber].isRestarting === false
+                        ? optionalBtnVar.hover
+                        : {}
+                    }
+                    onClick={(e) => onClickOptionHandler(e, 1)}
                 >
                     RESTART
                 </ST_SingleList.InfoOptionBtn>
@@ -243,6 +338,7 @@ function TotalSingleList() {
                     initial={optionalBtnVar.initial}
                     animate={optionalBtnVar.active}
                     whileHover={optionalBtnVar.hover}
+                    onClick={(e) => onClickOptionHandler(e, 2)}
                 >
                     DELETE
                 </ST_SingleList.InfoOptionBtn>
@@ -250,6 +346,56 @@ function TotalSingleList() {
             </>
             }
             </ST_SingleList.ProjectInfoBox>
+            <AnimatePresence>
+            {isClickedOption &&
+            <SpreadTotal_Common.QuestionOptionBox>
+                <SpreadTotal_Common.InOptionBox>
+                    <SpreadTotal_Common.OptionDesBox>
+                    {optionType === 0
+                    ? "Do you want to recreate this project?"
+                    : "Are you sure you want to delete this project?"
+                    }
+                    </SpreadTotal_Common.OptionDesBox>
+                    <SpreadTotal_Common.OptionBtnBox>
+                        <SpreadTotal_Common.OptionBtn
+                            variants={optionalBtnVar}
+                            initial={optionalBtnVar.initial}
+                            animate={optionalBtnVar.active}
+                            whileHover={optionalBtnVar.hover}
+                            onClick={(e) => {
+                                if(optionType === 0){
+                                    onClickRestartHanlder(e, true)
+                                }
+                                else if(optionType === 1){
+                                    onClickDeleteHanlder(e, true)
+                                }
+                            }}
+                        >
+                            Yes
+                        </SpreadTotal_Common.OptionBtn>
+                        <SpreadTotal_Common.OptionBtn
+                            variants={optionalBtnVar}
+                            initial={optionalBtnVar.initial}
+                            animate={optionalBtnVar.active}
+                            whileHover={optionalBtnVar.hover}
+                            onClick={(e) => {
+                                if(optionType === 0){
+                                    onClickRestartHanlder(e, false)
+                                }
+                                else if(optionType === 1){
+                                    onClickDeleteHanlder(e, false)
+                                }
+                            }}
+                        >
+                            No
+                        </SpreadTotal_Common.OptionBtn>
+                    </SpreadTotal_Common.OptionBtnBox>
+                </SpreadTotal_Common.InOptionBox>
+            </SpreadTotal_Common.QuestionOptionBox>
+            }
+            </AnimatePresence>
+            </ST_SingleList.InContainer>
+
         </ST_SingleList.Container>
     )
 }

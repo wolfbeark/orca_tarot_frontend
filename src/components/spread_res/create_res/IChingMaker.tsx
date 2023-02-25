@@ -403,7 +403,10 @@ function IChingMaker() {
             NS_T_PreviewCard : null, // if normal, tarot, preview three cards
             NS_T_UseAutoDeck : 0,
             NS_T_PreviewCardNumArr: null,
-            cardInfoArr: []
+            cardInfoArr: [],
+            isRestarting : false,
+            restartInfo : null,
+
         }
         
         let first = flagChecker();

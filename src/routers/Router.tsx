@@ -11,6 +11,7 @@ import Spread from "screen/Spread";
 import SingleSpread from 'screen/spread_child/SingleSpread'
 import MultiSpread from "screen/spread_child/MultiSpread";
 import CreateSpread from "screen/spread_child/CreateSpread";
+import SingleSpreadZone from "components/spread_res/single_spread_res/SingleSpreadZone";
 
 const router = createBrowserRouter([
     {
@@ -37,7 +38,13 @@ const router = createBrowserRouter([
                 children: [
                     {
                         path: 'single',
-                        element: <SingleSpread />
+                        element: <SingleSpread />,
+                        // children:[
+                        //     {
+                        //         path: ':id',
+                        //         element: <SingleSpreadZone />
+                        //     }
+                        // ]
                     },
                     {
                         path: 'multi',
