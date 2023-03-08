@@ -10,8 +10,15 @@ export interface IDragCardInfo {
     isDraged : boolean,
     isFlip : boolean,
     isRotate : boolean,
+    isHide: boolean,
     newX : number,
     newY : number,
+}
+export interface ISingleDeckIdxInfo {
+    startIdx : number,
+    lastIdx : number,
+    deckOracleType : number | null,
+    isThisExtraHide : boolean,
 }
 export interface ISingleRestartItem {
     creatingStep : number;
@@ -48,6 +55,15 @@ export interface ISingleProject {
     NS_T_PreviewCardNumArr? : number[] | null,
     cardInfoArr : IDragCardInfo[],
     isRestarting : boolean,
+    isHideOpen : boolean,
+    isFindOpen : boolean,
+    isOpenFindPannel : boolean,
+    isFindModeZoom : boolean,
+    zoomImgPath : string | null,
+    zoomImgName : string | null,
+    findImgPath : string | null,
+    findImgName : string | null,
+    deckIdxArr : ISingleDeckIdxInfo[] | null,
     restartInfo : ISingleRestartItem | null,
 }
 export interface ISingleControlManagerAtom {

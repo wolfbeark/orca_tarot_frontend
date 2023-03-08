@@ -2,7 +2,7 @@
 
 import React, {useState, useEffect, useLayoutEffect} from 'react'
 import styled from 'styled-components';
-import {motion} from 'framer-motion';
+import {AnimatePresence, motion} from 'framer-motion';
 
 import {HorCenterDiv, VerCenterDiv} from 'common_resources/CommonStyle';
 import { ILoginContainer } from 'common_resources/ComponentInterface';
@@ -222,9 +222,14 @@ function Error404() {
           </InContent2>
           <Loader.PuffLoader size={100} color='rgba(238, 90, 36,1.0)'></Loader.PuffLoader>
         </ContentBox>
+        <AnimatePresence>
         <ImageBox
+          initial={{opacity : 0}}
+          animate={{opacity : 1}}
+          exit={{opacity : 0}}
           imgsrc={`${process.env.PUBLIC_URL}${defaultImg}`}
         ></ImageBox>
+        </AnimatePresence>
         <CrossBox></CrossBox>
       </InContainer>
       <Snowfall

@@ -601,6 +601,7 @@ function SingleDraw() {
                     isDraged: false,
                     isFlip: false,
                     isRotate: false,
+                    isHide: false,
                     newX: 0,
                     newY: 0
                 }
@@ -618,6 +619,15 @@ function SingleDraw() {
                     NS_T_PreviewCardNumArr : null,
                     cardInfoArr: [],
                     isRestarting : false,
+                    isHideOpen: false,
+                    isFindOpen : false,
+                    isOpenFindPannel : false,
+                    isFindModeZoom : true,
+                    zoomImgPath : null,
+                    zoomImgName : null,
+                    findImgPath : null,
+                    findImgName : null,
+                    deckIdxArr : null,
                     restartInfo : null,
                 }
                 

@@ -7,7 +7,7 @@ import { useRecoilState } from 'recoil';
 import { ISingleControlManagerAtom, singleControlManagerAtom } from 'recoil/SingleAtom';
 import { ICustomDOMPosition, IPositionInfo } from 'common_resources/CommonInterfaces';
 import Draggable from 'react-draggable';
-import { AutoDeckGenerator, IAutoPosItem } from 'common_resources/CommonData';
+import { AutoDeckGenerator, FindTypeInfo, IAutoPosItem, ImgPathArr } from 'common_resources/CommonData';
 
 
 // styled
@@ -15,6 +15,7 @@ interface IDragContainer {
     positioninfo : IPositionInfo,
     imgsrc? : string,
     privaterotate? : string,
+    ishide? : string
 }
 // Props
 interface IDragCard{
@@ -40,6 +41,17 @@ const DragCardContainer = styled(HorCenterDiv)<IDragContainer>`
     position: absolute;
 
     padding: 0.2%;
+    ${(props) => {
+    if (props.ishide === "true") {
+        return css`
+            display: none;
+        `;
+        } else if (props.ishide === "false") {
+        return css`
+            display: flex;
+        `;
+        }
+    }}
     //user-select: none;
     & div{
         border-radius: inherit;
@@ -160,7 +172,25 @@ function DragCard(props : IDragCard) {
             }
         },  
     }
+    const [snap, setSnap] = useState<boolean>(!cardInfoArr[cardNumber].isInSpread)
+    const [constraints, setConstraints] = useState<React.MutableRefObject<HTMLDivElement>>(refArr[0]);
+    useEffect(()=>{
+        if(
+            cardInfoArr[cardNumber].isInSpread
+        ) setSnap(false)
+        else{
+            setSnap(true);
+        }
+    }, [singleManager]);
 
+    useEffect(()=>{
+        if(
+            cardInfoArr[cardNumber].isInSpread
+        ) setConstraints(refArr[1])
+        else{
+            setConstraints(refArr[0])
+        }
+    }, [singleManager]);
     useLayoutEffect(() => {
         let img = new Image();
         let uImg = new Image();
@@ -275,6 +305,8 @@ function DragCard(props : IDragCard) {
             _cardInfoArr[cardNumber].newY = beta;
             setSingleManager(_singleManager);
         }
+
+        
     }
 
     const onDoubleClickHandler = (e : React.MouseEvent<HTMLDivElement>) => {
@@ -408,6 +440,25 @@ function DragCard(props : IDragCard) {
         return tempObj
     }
 
+    const zoomImgSetting = () => {
+        let _singleManager : ISingleControlManagerAtom = JSON.parse(JSON.stringify(singleManager));
+        let {
+            cur_ProjectNumber,
+            singleProjectArr
+        } = _singleManager;
+        let {
+            oracleType,
+            imgNumber
+        } = cardInfoArr[cardNumber];
+        let _path = ImgPathArr[oracleType].defaultPath
+            + imgNumber + '.png';
+
+        let _name = FindTypeInfo[oracleType].detailNameArr[imgNumber];
+        singleProjectArr[cur_ProjectNumber].zoomImgPath = _path;
+        singleProjectArr[cur_ProjectNumber].zoomImgName = _name;
+        setSingleManager(_singleManager);
+    }
+
 
     const containerVar = {
         initial:{
@@ -420,6 +471,7 @@ function DragCard(props : IDragCard) {
             height: `${waitingInfo.height}px`,
             rotateZ : 0,
             opacity: 1,
+            //display: 'none'
 
         },
         rotateTrue :{
@@ -455,6 +507,7 @@ function DragCard(props : IDragCard) {
     }
     //console.log(singleProjectArr[cur_ProjectNumber].cardInfoArr[cardNumber].isDraged)
 
+    let styles = setStyles();
   return (
     <Draggable nodeRef={cardRef}>
         <AnimatePresence>
@@ -468,22 +521,42 @@ function DragCard(props : IDragCard) {
             drag
             dragElastic={0.56}
             dragSnapToOrigin={!cardInfoArr[cardNumber].isInSpread}
+            //dragSnapToOrigin={snap}
             dragMomentum={false}
             dragConstraints={cardInfoArr[cardNumber].isInSpread ? refArr[1] : refArr[0]}
+            //dragConstraints={constraints}
+            //style={{...styles}}
             style={setStyles()}
             onDragStart={onDragStartHandler}
             onDrag={onDragHandler}
             onDragEnd={onDragEndHandler}
             onClick={(e) => {
                 e.preventDefault();
-                // console.log(
-                //     cardInfoArr[cardNumber]
-                // )
+                // Zoom
+                if(singleProjectArr[cur_ProjectNumber].isFindOpen){
+                    if(singleProjectArr[cur_ProjectNumber].isFindModeZoom 
+                        && cardInfoArr[cardNumber].isFlip){
+                            zoomImgSetting();
+                        }
+                }
+                else return;
+
             }}
             onDoubleClick={onDoubleClickHandler}
             privaterotate={privateRotate === true ? "true" : "false"}
             variants={containerVar}
             initial={containerVar.initial}
+            // animate={
+            //     !privateRotate
+            //     ? {...containerVar.rotateFalse, 
+            //         display: cardInfoArr[cardNumber].isHide ? "none" : "flex"
+            //         //opacity: cardInfoArr[cardNumber].isHide ? 0 : 1
+            //     }
+            //     : {...containerVar.rotateTrue,
+            //         display: cardInfoArr[cardNumber].isHide ? "none" : "flex"
+            //         //opacity: cardInfoArr[cardNumber].isHide ? 0 : 1
+            //     }
+            // }
             animate={
                 !privateRotate
                 ? containerVar.rotateFalse
@@ -491,6 +564,9 @@ function DragCard(props : IDragCard) {
             }
             whileHover={
                 containerVar.hover
+            }
+            ishide={
+                cardInfoArr[cardNumber].isHide ? "true" : "false"
             }
         >
             <AnimatePresence>

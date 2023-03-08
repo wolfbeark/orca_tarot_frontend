@@ -2,7 +2,7 @@
 import React, {useEffect, useState} from 'react'
 import { useRecoilState, useResetRecoilState } from 'recoil';
 import { ITotalManagerAtom, totalManagerAtom } from 'recoil/TotalAtom';
-import { defaultRestartInfo, IDragCardInfo, ISingleControlManagerAtom, ISingleProject, singleControlManagerAtom } from 'recoil/SingleAtom';
+import { defaultRestartInfo, IDragCardInfo, ISingleControlManagerAtom, ISingleDeckIdxInfo, ISingleProject, singleControlManagerAtom } from 'recoil/SingleAtom';
 import { createControlManager, ICreateControlManager } from 'recoil/CreateAtom';
 
 import { 
@@ -173,6 +173,7 @@ function DrawIChingPannel(props : IDrawPannelProps) {
     }
     const nextBtnHandler = (e : React.MouseEvent<HTMLDivElement>) => {
         e.preventDefault();
+        if(!activeNextBtn) return;
         if(whatDrawMode === EWhatDrawMode.SINGLE){
             singleNextHandler();
         }
@@ -308,10 +309,17 @@ function DrawIChingPannel(props : IDrawPannelProps) {
             isDraged: false,
             isFlip : false,
             isRotate : false,
+            isHide: false,
             newX : 0,
             newY : 0,
         }
         let tempObjArr : IDragCardInfo[] = [];
+        let _deckIdxArrItem : ISingleDeckIdxInfo = {
+            startIdx : 0,
+            lastIdx : 0,
+            deckOracleType : null,
+            isThisExtraHide : false,
+        }
         let tempProject : ISingleProject = {
             projectId: 0,
             projectName: ``,
@@ -325,6 +333,15 @@ function DrawIChingPannel(props : IDrawPannelProps) {
             NS_T_PreviewCardNumArr: null,
             cardInfoArr: [],
             isRestarting: false,
+            isHideOpen: false,
+            isFindOpen: false,
+            isOpenFindPannel : false,
+            isFindModeZoom : true,
+            zoomImgPath : null,
+            zoomImgName : null,
+            findImgPath : null,
+            findImgName : null,
+            deckIdxArr: null,
             restartInfo : null,
 
         }
@@ -357,6 +374,13 @@ function DrawIChingPannel(props : IDrawPannelProps) {
         }
         tempProject.cardInfoArr = tempObjArr;
 
+        _deckIdxArrItem.startIdx = 0;
+        _deckIdxArrItem.lastIdx = (_createManager.cardCount - 1);
+        _deckIdxArrItem.deckOracleType = _createManager.oracleType;
+        _deckIdxArrItem.isThisExtraHide = false;
+        
+        tempProject.deckIdxArr = [_deckIdxArrItem];
+
         _singleManager.singleProjectArr.push(tempProject);
         setSingleManager(_singleManager);
         _total.projectCount++;
@@ -385,10 +409,16 @@ function DrawIChingPannel(props : IDrawPannelProps) {
             isDraged: false,
             isFlip : false,
             isRotate : false,
+            isHide: false,
             newX : 0,
             newY : 0,
         }
-        
+        let _deckIdxArrItem : ISingleDeckIdxInfo = {
+            startIdx : 0,
+            lastIdx : 0,
+            deckOracleType : null,
+            isThisExtraHide : false,
+        }
         let {
             cur_ProjectNumber,
             singleProjectArr
@@ -396,6 +426,16 @@ function DrawIChingPannel(props : IDrawPannelProps) {
 
         singleProjectArr[cur_ProjectNumber].totalCardCount += 2;
         singleProjectArr[cur_ProjectNumber].rem_CardCount = 2;
+
+        _deckIdxArrItem.startIdx = 
+            singleProjectArr[cur_ProjectNumber].cardInfoArr.length;
+        _deckIdxArrItem.lastIdx =
+            ((singleProjectArr[cur_ProjectNumber].cardInfoArr.length +
+                2    
+            ) - 1);
+        _deckIdxArrItem.deckOracleType = oracleType;
+        singleProjectArr[cur_ProjectNumber].deckIdxArr.push(_deckIdxArrItem);
+
         for(let i = 0; i < 2; i++){
             let _tempObj = {...tempObj};
             _tempObj.oracleType = 2;
@@ -407,6 +447,8 @@ function DrawIChingPannel(props : IDrawPannelProps) {
             }
             singleProjectArr[cur_ProjectNumber].cardInfoArr.push(_tempObj);
         }
+
+        
 
         setSingleManager(_singleManager);
         setIsOpenExtraMake(false);
@@ -450,8 +492,15 @@ function DrawIChingPannel(props : IDrawPannelProps) {
             isDraged: false,
             isFlip : false,
             isRotate : false,
+            isHide: false,
             newX : 0,
             newY : 0,
+        }
+        let _deckIdxArrItem : ISingleDeckIdxInfo = {
+            startIdx : 0,
+            lastIdx : 0,
+            deckOracleType : null,
+            isThisExtraHide : false,
         }
         let tempObjArr : IDragCardInfo[] = [];
 
@@ -471,6 +520,11 @@ function DrawIChingPannel(props : IDrawPannelProps) {
             _pastItem.rem_CardCount = restartInfo.cardCount;
         }
 
+        _deckIdxArrItem.startIdx = 0;
+        _deckIdxArrItem.lastIdx = (restartInfo.cardCount - 1);
+        _deckIdxArrItem.deckOracleType = restartInfo.oracleType;
+        _deckIdxArrItem.isThisExtraHide = false;
+        _pastItem.deckIdxArr = [_deckIdxArrItem];
 
         for(let i = 0; i < 2; i++){
             let _tempObj = {...tempObj};
@@ -485,6 +539,16 @@ function DrawIChingPannel(props : IDrawPannelProps) {
         }
         _pastItem.cardInfoArr = tempObjArr;
         _pastItem.isRestarting = false;
+
+        _pastItem.isHideOpen = false;
+        _pastItem.isFindOpen = false;
+        _pastItem.isOpenFindPannel = false;
+        _pastItem.isFindModeZoom = true;
+        _pastItem.findImgName = null;
+        _pastItem.findImgPath = null;
+        _pastItem.zoomImgName = null;
+        _pastItem.zoomImgPath = null;
+        
         setSingleManager(_singleManager);
     }
 

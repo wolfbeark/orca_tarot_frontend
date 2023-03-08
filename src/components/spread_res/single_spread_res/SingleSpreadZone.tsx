@@ -15,6 +15,9 @@ import { SSO_RQuestion, SS_Common, SS_RestartFirst } from './SingleSpreadZone.st
 import RestartSingleSpread from './RestartSingle/RestartSingleSpread';
 //import { ISingleRestartItem, ISingleRestartManager, singleRestartManagerAtom } from 'recoil/RestartAtom';
 import {useLocation, useParams} from 'react-router-dom';
+import HideSingle from './HideSingle/HideSingle';
+import FindSingle from './FindSingle/FindSingle';
+import FindSingle_Second from './FindSingle/FindSingle_Second';
 interface IPreviewContainer {
     positioninfo? : IPositionInfo,
     imgsrc? : string
@@ -291,21 +294,23 @@ function SingleSpreadZone() {
     
     // 2023.02.13 수술중
     const [isOpenExtraMake, setIsOpenExtraMake] = useState<boolean>(false);
+    const [isOpenFind, setIsOpenFind] = useState<boolean>(true);
     const [isOpenRestart, setIsOpenRestart] = useState<boolean>(false);
-
+    const [isOpenHide, setIsOpenHide] = useState<boolean>(false);
 
     const {optionBtnVar} = SS_Common;
         //console.log(location)
         //console.log(params);
 
+    
+
     useEffect(()=>{
-        if(isOpenRestart) setIsOpenRestart(false);
-        if(isOpenExtraMake) setIsOpenExtraMake(false);
-        return() => {
-          if(isOpenRestart) setIsOpenRestart(false);
-          if(isOpenExtraMake) setIsOpenExtraMake(false);
-        };
-    }, [singleManager.cur_ProjectNumber])
+      if(singleProjectArr[cur_ProjectNumber].isHideOpen){
+        setIsOpenHide(true);
+      }
+    }, [singleManager.cur_ProjectNumber, singleManager.singleProjectArr, singleManager]);
+
+
     useLayoutEffect(()=> {
       if(singleProjectArr[cur_ProjectNumber].NS_T_PreviewCard){
         let _tempArr : string[] = []
@@ -376,6 +381,17 @@ function SingleSpreadZone() {
         // _tempOption.openedOptionType = 0;
         // setSpreadOption(_tempOption);
       }
+      else if(type === 1){
+        _singleProjectArr[cur_ProjectNumber].isHideOpen = true;
+        setSingleManager(_singleManager);
+      }
+      else if(type === 2){
+        let flag =
+          _singleProjectArr[cur_ProjectNumber].isFindOpen;
+        _singleProjectArr[cur_ProjectNumber].isFindOpen = !flag;
+        setSingleManager(_singleManager);
+        //setIsOpenFind((prev) => !prev);
+      }
       else if(type === 3){
         for(let i = 0; i < _cardInfoArr.length; i++){
           if(_cardInfoArr[i].isFlip === true ||
@@ -444,31 +460,23 @@ function SingleSpreadZone() {
       let _id = singleProjectArr[cur_ProjectNumber].projectId;
 
       let tempName : string = dateString + '_' + projectType + _id + '_' + projectName + '.png';
-        // if (customFileName === "") {
-        //   tempName = "image-download.png";
-        // } else {
-        //   tempName = `${customFileName}.png`;
-        // }
-        //console.log(tempName);
+       
         html2canvas(document.getElementById("singleSpreadZone")).then(
           (canvas) => {
             onSaveAs(canvas.toDataURL("image/png"), tempName);
           }
-          //"image-download.png"
         );
     };
     const onSaveAs = (uri : any, filename : any) => {
-      //console.log('onSaveAs');
+      
       let link = document.createElement("a");
       document.body.appendChild(link);
       link.href = uri;
       link.download = filename;
-      //link.style.zIndex = "1000";
-      //link.style.position = "absolute";
-      //console.dir(link);
+      
       link.click();
       document.body.removeChild(link);
-      //window.location.reload();
+      
     };
     const onClickRestartOptionBtn = (e : React.MouseEvent<HTMLDivElement>, type : number) => {
       e.preventDefault();
@@ -517,16 +525,7 @@ function SingleSpreadZone() {
         />
         }
         </AnimatePresence>
-        <SingleSpreadContainer
-          //initial={{opacity:0}}
-          //animate={{opacity: 1, zIndex: 1}}
-          //exit={{opacity: 0, zIndex: 0}}
-          // style={
-          //   singleProjectArr[cur_ProjectNumber].isRestarting
-          //   ? {display: 'hidden'} 
-          //   : {display : 'visible'}
-          // }
-        >
+        <SingleSpreadContainer>
             <InSingleSpreadZone
                 ref={totalRef}
                 id="singleSpreadZone"
@@ -605,8 +604,9 @@ function SingleSpreadZone() {
                                 refArr={refArr}
                             />
                         );
-                    })
-                }
+                        })
+                    }
+                    
                     </CardWaitingZone>
                     <ExtraDeckZone>
                       <AnimatePresence>
@@ -667,7 +667,17 @@ function SingleSpreadZone() {
                     })
                   }
                 </SpreadControlBtnBox>
+              
               </SpreadControl>
+              <AnimatePresence>
+              {
+              singleProjectArr[cur_ProjectNumber].isFindOpen &&
+              <FindSingle 
+                refArr={refArr}
+                positioninfo={positionInfo}
+              />
+              }
+              </AnimatePresence>
             </InSingleSpreadZone>
             <AnimatePresence>
               {isOpenExtraMake &&
@@ -677,43 +687,17 @@ function SingleSpreadZone() {
               }
             </AnimatePresence>
             <AnimatePresence>
-            {/* {isOpenRestart === true &&
-            <SSO_RQuestion.Container>
-              <SSO_RQuestion.QuestionBox>
-                <SSO_RQuestion.InQuestionBox>
-                  <SSO_RQuestion.QuestionDesBox>Restart</SSO_RQuestion.QuestionDesBox>
-                  <SSO_RQuestion.QuestionBtnBox>
-                    <SSO_RQuestion.OptionBtn
-                      variants={optionBtnVar}
-                      initial={optionBtnVar.initial}
-                      animate={optionBtnVar.active}
-                      whileHover={optionBtnVar.hover}
-                      onClick={(e) => onClickRestartOptionBtn(e, 0)}
-                    >
-                      YES
-                    </SSO_RQuestion.OptionBtn>
-                    <SSO_RQuestion.OptionBtn
-                      variants={optionBtnVar}
-                      initial={optionBtnVar.initial}
-                      animate={optionBtnVar.active}
-                      whileHover={optionBtnVar.hover}
-                      onClick={(e) => onClickRestartOptionBtn(e, 1)}
-                    >
-                      NO
-                    </SSO_RQuestion.OptionBtn>
-                  </SSO_RQuestion.QuestionBtnBox>
-                </SSO_RQuestion.InQuestionBox>
-              </SSO_RQuestion.QuestionBox>
-            </SSO_RQuestion.Container>
-            } */}
-            </AnimatePresence>
-            {/* <AnimatePresence>
-            {singleProjectArr[cur_ProjectNumber].isRestarting === true &&
-            <RestartSingleSpread 
-              projectId={singleProjectArr[cur_ProjectNumber].projectId}
-            />
+            {singleProjectArr[cur_ProjectNumber].isHideOpen &&
+              <HideSingle />
             }
-            </AnimatePresence> */}
+            </AnimatePresence>
+            <AnimatePresence>
+            {singleProjectArr[cur_ProjectNumber].isOpenFindPannel &&
+              <FindSingle_Second />
+            }
+            </AnimatePresence>
+            
+            
         </SingleSpreadContainer>
         </>
       )

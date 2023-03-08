@@ -19,7 +19,7 @@ import {
 
 import { ITotalManagerAtom, totalManagerAtom } from 'recoil/TotalAtom';
 import { createControlManager, ICreateControlManager } from 'recoil/CreateAtom';
-import { defaultRestartInfo, IDragCardInfo, ISingleControlManagerAtom, ISingleProject, ISingleRestartItem, singleControlManagerAtom } from 'recoil/SingleAtom';
+import { defaultRestartInfo, IDragCardInfo, ISingleControlManagerAtom, ISingleDeckIdxInfo, ISingleProject, ISingleRestartItem, singleControlManagerAtom } from 'recoil/SingleAtom';
 import { useNavigate } from 'react-router-dom';
 import { ExtraTarotDeckInfoArr } from 'components/spread_res/single_spread_res/MakeExtraPannel/MakeExtraPannel.styled';
 
@@ -523,6 +523,7 @@ function DrawPannel(props : IDrawPannelProps) {
                 isDraged: false,
                 isFlip: false,
                 isRotate: false,
+                isHide: false,
                 newX: 0,
                 newY: 0
             }
@@ -538,6 +539,12 @@ function DrawPannel(props : IDrawPannelProps) {
                 NS_T_UseAutoDeck: 0,
                 tempRanNumArr: []
             }
+            let _deckIdxArrItem : ISingleDeckIdxInfo = {
+                startIdx : 0,
+                lastIdx : 0,
+                deckOracleType : null,
+                isThisExtraHide : false,
+            }
             let tempProject : ISingleProject = {
                 projectId: 0,
                 projectName: ``,
@@ -550,7 +557,16 @@ function DrawPannel(props : IDrawPannelProps) {
                 NS_T_UseAutoDeck : 0,
                 NS_T_PreviewCardNumArr : null,
                 cardInfoArr: [],
-                isRestarting: false,
+                isRestarting : false,
+                isHideOpen : false,
+                isFindOpen : false,
+                isOpenFindPannel : false,
+                isFindModeZoom : true,
+                zoomImgPath : null,
+                zoomImgName : null,
+                findImgPath : null,
+                findImgName : null,
+                deckIdxArr : null,
                 restartInfo : {..._tempRestartInfo},
             }
             
@@ -618,6 +634,12 @@ function DrawPannel(props : IDrawPannelProps) {
             tempObjArr[i] = _tempObj;
         }
             tempProject.cardInfoArr = tempObjArr;
+
+            _deckIdxArrItem.startIdx = 0;
+            _deckIdxArrItem.lastIdx = (_createManager.cardCount - 1);
+            _deckIdxArrItem.deckOracleType = _createManager.oracleType;
+            _deckIdxArrItem.isThisExtraHide = false;
+            tempProject.deckIdxArr = [_deckIdxArrItem];
 
             _singleManager.singleProjectArr.push(tempProject);
             _total.projectCount++;
@@ -793,8 +815,15 @@ function DrawPannel(props : IDrawPannelProps) {
                 isDraged: false,
                 isFlip: false,
                 isRotate: false,
+                isHide: false,
                 newX: 0,
                 newY: 0
+            }
+            let _extraInfoItem : ISingleDeckIdxInfo = {
+                startIdx : 0,
+                lastIdx : 0,
+                deckOracleType : null,
+                isThisExtraHide : false,
             }
             // _numArr에 이미지 번호 담기
             // 프로젝트 새로 생성 필요없음, 기존에 있는것에 넣을 것이라서.
@@ -807,6 +836,20 @@ function DrawPannel(props : IDrawPannelProps) {
             
             singleProjectArr[cur_ProjectNumber].totalCardCount += extraCardCount;
             singleProjectArr[cur_ProjectNumber].rem_CardCount = extraCardCount;
+            _extraInfoItem.startIdx = 
+                    singleProjectArr[cur_ProjectNumber].cardInfoArr.length;
+            _extraInfoItem.lastIdx =
+                ((singleProjectArr[cur_ProjectNumber].cardInfoArr.length +
+                    extraCardCount    
+                ) - 1);
+            _extraInfoItem.deckOracleType = oracleType;
+
+            // if(singleProjectArr[cur_ProjectNumber].deckIdxArr === null){
+            //     singleProjectArr[cur_ProjectNumber].deckIdxArr = [{..._extraInfoItem}];
+            // }
+            // else{
+            // }
+            singleProjectArr[cur_ProjectNumber].deckIdxArr.push(_extraInfoItem);
             
             for(let i = 0; i < extraCardCount; i++){
                 let _tempObj = {...tempObj};
@@ -956,10 +999,17 @@ function DrawPannel(props : IDrawPannelProps) {
                 isDraged: false,
                 isFlip: false,
                 isRotate: false,
+                isHide: false,
                 newX: 0,
                 newY: 0
             }
             let tempObjArr : IDragCardInfo[] = [];
+            let _deckIdxArrItem : ISingleDeckIdxInfo = {
+                startIdx : 0,
+                lastIdx : 0,
+                deckOracleType : null,
+                isThisExtraHide : false,
+            }
             let _tempRestartInfo : ISingleRestartItem = {
                 creatingStep: 0,
                 projectId: 0,
@@ -984,6 +1034,15 @@ function DrawPannel(props : IDrawPannelProps) {
                 NS_T_PreviewCardNumArr : null,
                 cardInfoArr: [],
                 isRestarting: false,
+                isHideOpen: false,
+                isFindOpen : false,
+                isOpenFindPannel : false,
+                isFindModeZoom : true,
+                zoomImgPath : null,
+                zoomImgName : null,
+                findImgPath: null,
+                findImgName : null,
+                deckIdxArr : null,
                 restartInfo : {..._tempRestartInfo},
             }
             
@@ -1039,9 +1098,23 @@ function DrawPannel(props : IDrawPannelProps) {
             }
             _pastItem.cardInfoArr = tempObjArr;
 
+            _deckIdxArrItem.startIdx = 0;
+            _deckIdxArrItem.lastIdx = (restartInfo.cardCount - 1);
+            _deckIdxArrItem.deckOracleType = restartInfo.oracleType;
+            _deckIdxArrItem.isThisExtraHide = false;
+            //tempProject.deckIdxArr = [_deckIdxArrItem];
+            _pastItem.deckIdxArr = [_deckIdxArrItem];
 
             //_pastItem.restartInfo = null;
             _pastItem.isRestarting = false;
+            _pastItem.isHideOpen = false;
+            _pastItem.isFindOpen = false;
+            _pastItem.isOpenFindPannel = false;
+            _pastItem.isFindModeZoom = true;
+            _pastItem.findImgName = null;
+            _pastItem.findImgPath = null;
+            _pastItem.zoomImgName = null;
+            _pastItem.zoomImgPath = null;
 
             setSingleManager(_singleManager);
         }

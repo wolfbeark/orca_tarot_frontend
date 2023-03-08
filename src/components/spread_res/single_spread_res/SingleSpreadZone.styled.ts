@@ -20,7 +20,7 @@ export namespace SS_Common {
             borderRadius: '5px',
             backgroundColor: 'rgba(20, 20, 20, 0.7)',
             color :'rgba(240, 147, 43,1.0)',
-            border: '2px solid rgba(24, 220, 255, 0.3)',
+            border: '2px solid rgba(24, 220, 255, 0.5)',
 
         },
         inactive :{
@@ -375,5 +375,216 @@ export namespace SS_RestartSecond{
         color: ${(props) => props.theme.textColors.swanWhite};
         letter-spacing: 0.05em;
         font-size: 120%;
+    `
+}
+export namespace SS_Hide{
+    export const Container = styled(HorCenterDiv)`
+        width: 100%;
+        height: 100%;
+        position: absolute;
+        z-index: 1;
+        background-color: ${(props) => props.theme.defaultBaseOpaqueColor};
+    `
+    export const HideBox = styled(HorCenterDiv)`
+        width: 50%;
+        height: 70%;
+        background-color: inherit;
+        border-radius: ${(props) => props.theme.borders.small};
+        padding: 0.5%;
+    `
+    export const InHideBox = styled(VerCenterDiv)`
+        width: 100%;
+        height: 100%;
+        //background-color: skyblue;
+        justify-content: space-between;
+        border-radius: inherit;
+        & > div{
+            border-radius: inherit;
+        }
+    `
+    export const HideDesBox = styled(HorCenterDiv)`
+        width: 100%;
+        height: 20%;
+        //background-color: yellow;
+        justify-content: flex-start;
+        font-size: 170%;
+        padding-left: 2%;
+        color: ${(props) => props.theme.spreadDefaultTextColor};
+    `
+    export const HideControlBox = styled(HorCenterDiv)`
+        width: 100%;
+        height: 79%;
+        //background-color: olive;
+        justify-content: space-between;
+    `
+    export const ExtraInfoList = styled(VerCenterDiv)`
+        width: 65%;
+        height: 100%;
+        //background-color: gray;        
+    `
+    export const InSingleExtraInfo = styled(VerCenterDiv)`
+        width: 100%;
+        height: 100%;
+        background-color: ${(props) => props.theme.defaultBaseOpaqueColor};
+        border-radius: ${(props) => props.theme.borders.small};
+        //background-color: inherit;
+        //position: absolute;
+        //padding-left: 1%;
+        padding: 1%;
+        
+        display: flex;
+        justify-content: flex-start;
+        //align-items: flex-end;
+        overflow: auto;
+
+
+        justify-content: flex-start;
+        align-items: center;
+        user-select: none;
+        
+        scroll-behavior: auto;
+        overflow: overlay;
+        overflow-x: hidden;
+
+        ::-webkit-scrollbar {
+            width: 1vw;
+        }
+        ::-webkit-scrollbar-thumb {
+            background-color: hsla(0, 0%, 42%, 0.49);
+            border-radius: 100px;
+        }
+    `
+    export const ControlBox = styled(VerCenterDiv)`
+        width: 34%;
+        height: 100%;
+        //background-color: brown;
+        border-radius: ${(props) => props.theme.borders.small};
+        justify-content: space-between;
+        background-color: ${(props) => props.theme.defaultBaseOpaqueColor};
+    `
+    export const ExtraInfoNoticeBox = styled(VerCenterDiv)`
+        width: 100%;
+        height: 75%;
+        //background-color: cadetblue;
+        border: 2px solid rgba(24, 220, 255, 0.7);
+        border-radius: inherit;
+        padding: 0.5%;
+        justify-content: flex-start;
+        color: ${(props) => props.theme.spreadDefaultTextColor};
+        
+        & > div:first-child{
+            display: flex;
+            justify-content: flex-start;
+            align-items: center;
+            padding-left: 1%;
+            font-size: 130%;
+            //font-weight: 600;
+            letter-spacing: 0.1em;
+            width: 100%;
+            height: 20%;
+            //background-color: seagreen;
+            border-bottom: 2px solid rgba(24, 220, 255, 0.3);
+            margin-bottom: 2%;
+        }
+    `
+    export const InfoNoticeItem = styled(HorCenterDiv)`
+        width: 100%;
+        height: 25%;
+        //background-color: gold;
+        justify-content: space-between;
+        margin-bottom: 1%;
+        //color: ${(props) => props.theme.spreadDefaultTextColor};
+        color: rgba(240, 147, 43,1.0);
+        &:last-child{
+            margin-bottom: 0;
+        }
+        & > div{
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 120%;
+            &:first-child{
+                width: 50%;
+                height: 100%;
+                //background-color: gainsboro;
+                justify-content: space-between;
+                //padding-left: 1%;
+                & > div:first-child{
+                    padding-left: 2%;
+                }
+                & > div:last-child{
+                    margin-right: 2%;
+                }
+            }
+            &:last-child{
+                width: 49%;
+                height: 100%;
+                //background-color: pink;
+            }
+        }
+    `
+
+    export const OptionalBtnBox = styled(VerCenterDiv)`
+        width: 100%;
+        height: 24%;
+        //background-color: navy;
+    `
+    export const ExtraInfoItem = styled(HorCenterDiv)`
+        //min-width: 90%;
+        width: 100%;
+        min-height: 15%;
+        height: auto;
+        background-color : inherit;
+        border-radius: inherit;
+        margin-bottom: 2%;
+        border: 2px solid rgba(24, 220, 255, 0.7);
+        justify-content: space-between;
+        position: relative;
+        padding: 0 1%;
+        &:last-child {
+            margin-bottom: 0;
+        }
+        cursor: pointer;
+    `
+    export const ExtraNumber = styled(HorCenterDiv)`
+        width: 10%;
+        height: 100%;
+        border-radius: inherit;
+        //background-color: gray;
+        font-size: 150%;
+        //font-weight: 600;
+    `
+    export const ExtraOracle = styled(HorCenterDiv)`
+        width: 43%;
+        height: 100%;
+        //background-color: orangered;
+        font-size: 150%;
+        //font-weight: 600;
+        letter-spacing: 0.2em;
+    `
+    export const SelectBtnBox = styled(HorCenterDiv)`
+        width: 43%;
+        height: 100%;
+        //background-color: olive;
+        justify-content: space-evenly;
+        padding: 1%;
+    `
+    export const SelectBtn = styled(HorCenterDiv)`
+        width: 40%;
+        height: 100%;
+        border-radius: ${(props) => props.theme.borders.small};
+    `
+    export const BackBtn = styled(HorCenterDiv)`
+        width: 60%;
+        height: 50%;
+        cursor: pointer;
+    `
+    export const RedCircle = styled(HorCenterDiv)`
+        width: 5px;
+        height: 5px;
+        background-color: red;
+        border-radius: 50%;
+        position: absolute;
+        left: 2%;
     `
 }
