@@ -192,7 +192,7 @@ const ControlBtn = styled(HorCenterDiv)`
   }
 `;
 const PreviewBox = styled(HorCenterDiv)<IPreviewContainer>`
-  width: 5%;
+  width: 10%;
   height: 10%;
   background-color: ${(props) => props.theme.defaultBaseOpaqueColor};
   border: 2px solid rgba(24, 220, 255, 0.3);
@@ -214,8 +214,8 @@ const PreviewBox = styled(HorCenterDiv)<IPreviewContainer>`
     position: relative;
     & > div {
       cursor: auto;
-      width: 500%;
-      height: 220%;
+      width: 400%;
+      height: 300%;
       background-color: ${(props) => props.theme.defaultBaseOpaqueColor};
       position: absolute;
       left: 110%;
